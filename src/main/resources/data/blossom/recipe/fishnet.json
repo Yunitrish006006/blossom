@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "function",
+  "key": {
+    "X": "minecraft:string",
+    "Y": "minecraft:stick"
+  },
+  "pattern": [
+    "YXY",
+    "X X",
+    "YXY"
+  ],
+  "result": {
+    "count": 1,
+    "id": "blossom:fishnet"
+  }
+}

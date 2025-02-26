@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": "minecraft:pufferfish",
+  "result": {
+    "id": "blossom:cooked_pufferfish"
+  },
+  "experience": 6,
+  "cookingtime": 70
+}

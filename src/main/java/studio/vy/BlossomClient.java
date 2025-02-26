@@ -6,6 +6,5 @@ public class BlossomClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-
     }
 }
