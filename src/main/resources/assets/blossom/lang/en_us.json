@@ -9,5 +9,11 @@
   "itemGroup.blossom.title": "Blossom",
 
   "key.categories.blossom": "Blossom",
-  "key.blossom.open_unit_screen": "Open Teleport Screen"
+  "key.blossom.open_unit_screen": "Open Teleport Screen",
+
+  "gui.blossom.teleport.title": "Teleport",
+  "gui.blossom.teleport.teleport": "Teleport",
+  "gui.blossom.teleport.cancel": "Cancel",
+  "gui.blossom.teleport.create": "Create",
+  "gui.blossom.teleport.create_new_unit": "Create New Unit"
 }

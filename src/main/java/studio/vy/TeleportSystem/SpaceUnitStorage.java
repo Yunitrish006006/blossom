@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class SpaceUnitStorage{
@@ -61,7 +60,7 @@ public class SpaceUnitStorage{
         char[] array = string.toCharArray();
         for (int i = 0; i < array.length; i++) {
             char it = array[i];
-            if (it == '{') {
+            if (it == '{' || it == '[') {
                 tabCounter += 1;
                 temp.append(it).append("\n");
                 if (tabCounter > 0) temp.append("\t".repeat(tabCounter));
@@ -72,7 +71,7 @@ public class SpaceUnitStorage{
                 temp.append(it);
             }
             if (i + 1 < array.length) {
-                if (array[i + 1] == '}') {
+                if (array[i + 1] == '}' || array[i + 1] == ']') {
                     temp.append("\n");
                     tabCounter -= 1;
                     if (tabCounter > 0) temp.append("\t".repeat(tabCounter));
@@ -84,7 +83,6 @@ public class SpaceUnitStorage{
 
     public void write() {
         try {
-            System.out.println("Writing to file"+file.getPath());
             FileWriter writer = new FileWriter(file);
             writer.write(beautify(new Gson().toJson(config)));
             writer.close();

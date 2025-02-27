@@ -27,7 +27,7 @@ public class CreateUnitScreen extends Screen {
     }
 
     public CreateUnitScreen(Screen parent) {
-        super(Text.literal("Create Space Unit"));
+        super(Text.translatable("gui.blossom.teleport.create_new_unit"));
         this.parent = parent;
     }
 
@@ -42,14 +42,14 @@ public class CreateUnitScreen extends Screen {
                 50,
                 FIELD_WIDTH,
                 FIELD_HEIGHT,
-                Text.literal("Name")
+                Text.translatable("Name")
         );
         nameField.setMaxLength(32);
         this.addDrawableChild(nameField);
 
         // Create button
         this.addDrawableChild(ButtonWidget.builder(
-                        Text.literal("Create"),
+                        Text.translatable("gui.blossom.teleport.create"),
                         button -> {
                             if (!nameField.getText().isEmpty()) {
                                 createUnit(nameField.getText());
@@ -61,7 +61,7 @@ public class CreateUnitScreen extends Screen {
 
         // Cancel button
         this.addDrawableChild(ButtonWidget.builder(
-                        Text.literal("Cancel"),
+                        Text.translatable("gui.blossom.teleport.cancel"),
                         button -> MinecraftClient.getInstance().setScreen(parent))
                 .dimensions(this.width / 2 - FIELD_WIDTH / 2, 110, FIELD_WIDTH, FIELD_HEIGHT)
                 .build()
@@ -77,7 +77,6 @@ public class CreateUnitScreen extends Screen {
             String dimension = client.player.getWorld().getRegistryKey().getValue().toString();
             if (client.isInSingleplayer()) {
                 storage.addUnit(new SpaceUnit(name, x, y, z, dimension, client.player.getUuid()));
-                storage.write();
             }
             else {
                 sendCreateUnitPacket(name, x, y, z, dimension);

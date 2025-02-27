@@ -36,7 +36,6 @@ public class BlossomClient implements ClientModInitializer {
     }
     private void openUnitScreen(MinecraftClient client) {
         ArrayList<SpaceUnit> units = new ArrayList<>();
-        units.add(new SpaceUnit("home",0,120, 0, "minecraft:overworld",null));
         client.setScreen(new UnitScreen(units));
     }
 }

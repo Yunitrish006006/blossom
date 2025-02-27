@@ -15,17 +15,18 @@ public class UnitScreen extends Screen {
     private static final int BUTTON_HEIGHT = 20;
 
     public UnitScreen(List<SpaceUnit> units) {
-        super(Text.literal("Space Units"));
+        super(Text.translatable("gui.blossom.teleport.title"));
         this.units = units;
     }
 
     @Override
     protected void init() {
         super.init();
+        units.clear();
         units.addAll(CreateUnitScreen.storage.getUnits());
         // Add Create button at the top
         this.addDrawableChild(ButtonWidget.builder(
-                        Text.literal("Create New Unit"),
+                        Text.translatable("gui.blossom.teleport.create_new_unit"),
                         button -> {
                             MinecraftClient.getInstance().setScreen(new CreateUnitScreen(this));
                         })
@@ -52,8 +53,8 @@ public class UnitScreen extends Screen {
         assert client != null;
         if (client.isInSingleplayer()) {
             if (client.player != null) {
-                client.player.setPosition(unit.x(), unit.y(), unit.z());
-                client.setScreen(null);
+                unit.teleport(client.player);
+                client.player.closeScreen();
             }
         }
         else {
@@ -62,7 +63,6 @@ public class UnitScreen extends Screen {
     }
 
     private void sendTeleportPacket(SpaceUnit unit) {
-
     }
 
     @Override
