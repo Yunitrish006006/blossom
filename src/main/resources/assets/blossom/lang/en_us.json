@@ -6,5 +6,8 @@
   "block.blossom.trash_can": "Trash Can",
   "block.blossom.gravel_iron_ore": "Gravel Iron Ore",
 
-  "itemGroup.blossom.title": "Blossom"
+  "itemGroup.blossom.title": "Blossom",
+
+  "key.categories.blossom": "Blossom",
+  "key.blossom.open_unit_screen": "Open Teleport Screen"
 }
