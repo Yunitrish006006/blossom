@@ -1,13 +1,11 @@
 package studio.vy.TeleportSystem;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
-import studio.vy.Blossom;
 
 import java.io.IOException;
 
@@ -86,11 +84,7 @@ public class CreateUnitScreen extends Screen {
     }
 
     private void sendCreateUnitPacket(String name, double x, double y, double z, String dimension) {
-        TeleportPayload payload = new TeleportPayload(name, x, y, z, dimension);
-        if (ClientPlayNetworking.canSend(TeleportPayload.PACKET_ID)) {
-            Blossom.LOGGER.info("Sending create unit packet: " + payload);
-            ClientPlayNetworking.send(payload);
-        }
+
     }
 
 

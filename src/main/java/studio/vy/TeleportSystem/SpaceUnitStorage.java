@@ -9,16 +9,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
 public class SpaceUnitStorage{
 
-    private static Path FabricConfigDirection = FabricLoader.getInstance().getConfigDir();
+    private static final Path FabricConfigDirection = FabricLoader.getInstance().getConfigDir();
     private final File file;
     private final String fileName = "units.json";
     private SpaceUnitConfig config;
 
     public SpaceUnitStorage() throws IOException {
-        System.out.println("Creating storage:"+FabricConfigDirection + fileName);
         this.file = new File(FabricConfigDirection+"/"+fileName);
         if (file.exists()) {
             config = read();
@@ -36,16 +36,25 @@ public class SpaceUnitStorage{
         write();
     }
 
-    public List<SpaceUnit> getUnits() {
+    public List<SpaceUnit> getAllUnits() {
         return config.units;
+    }
+
+    public List<SpaceUnit> getOwnedUnits(UUID uuid) {
+        List<SpaceUnit> temp = new java.util.ArrayList<>(List.of());
+        for (SpaceUnit unit : config.units) {
+            if (unit.owner().equals(uuid)) {
+                temp.add(unit);
+            }
+        }
+        return temp;
     }
 
     public SpaceUnitConfig read() {
         try {
             FileReader reader = new FileReader(file);
             config = new Gson().fromJson(reader, SpaceUnitConfig.class);
-            System.out.println("Reading from file"+file.getPath());
-            System.out.println(config);
+//            System.out.println("Reading from file"+file.getPath());
             reader.close();
             return config;
         }

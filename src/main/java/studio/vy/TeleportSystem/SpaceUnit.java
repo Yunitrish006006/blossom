@@ -17,8 +17,14 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         UUID id = player.getUuid();
         if (owner.equals(id) || admin.contains(id) || allowed.contains(id)) {
             Vec3d pos = player.getPos();
-            player.setPosition(x, y, z);
-            player.sendMessage(Text.of("Traveled for " + Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2) + Math.pow(z - pos.z, 2)) + " blocks"), false);
+            if (player.teleport(x, y, z, true)) {
+                player.sendMessage(Text.of("Traveled for " + Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2) + Math.pow(z - pos.z, 2)) + " blocks"), false);
+            } else {
+                player.sendMessage(Text.of("Teleport failed - make sure the destination is loaded"), false);
+            }
+        }
+        else {
+            player.sendMessage(Text.of("You are not allowed to teleport to this unit"), false);
         }
     }
 }
