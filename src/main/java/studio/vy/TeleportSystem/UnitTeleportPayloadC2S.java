@@ -14,31 +14,11 @@ import java.util.UUID;
 public record UnitTeleportPayloadC2S(SpaceUnit unit) implements CustomPayload {
 
     public static final Id<UnitTeleportPayloadC2S> ID = CustomPayload.id("unit_teleport_c2s");
-    public static final PacketCodec<PacketByteBuf, UnitTeleportPayloadC2S> CODEC = PacketCodec.of(UnitTeleportPayloadC2S::encode, UnitTeleportPayloadC2S::decode);
-
-    public void encode(PacketByteBuf buf) {
-        buf.writeString(unit.name());
-        buf.writeDouble(unit.x());
-        buf.writeDouble(unit.y());
-        buf.writeDouble(unit.z());
-        buf.writeString(unit.dimension());
-        buf.writeUuid(unit.owner());
-        buf.writeCollection(unit.admin(), (buffer, uuid) -> buffer.writeUuid(uuid));
-        buf.writeCollection(unit.allowed(), (buffer, uuid) -> buffer.writeUuid(uuid));
-    }
-
-    public static UnitTeleportPayloadC2S decode(PacketByteBuf buf) {
-        String name = buf.readString();
-        double x = buf.readDouble();
-        double y = buf.readDouble();
-        double z = buf.readDouble();
-        String dimension = buf.readString();
-        UUID owner = buf.readUuid();
-        List<UUID> admin = buf.readCollection(ArrayList::new, (buffer) -> buffer.readUuid());
-        List<UUID> allowed = buf.readCollection(ArrayList::new, (buffer) -> buffer.readUuid());
-        return new UnitTeleportPayloadC2S(new SpaceUnit(name, x, y, z, dimension, owner, admin, allowed));
-    }
-
+    public static final PacketCodec<PacketByteBuf, UnitTeleportPayloadC2S> CODEC = PacketCodec.tuple(
+            SpaceUnit.PACKET_CODEC.cast(),
+            UnitTeleportPayloadC2S::unit,
+            UnitTeleportPayloadC2S::new
+    );
 
     @Override
     public Id<? extends CustomPayload> getId() {

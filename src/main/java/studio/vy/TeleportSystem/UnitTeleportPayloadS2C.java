@@ -7,7 +7,6 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
-import studio.vy.Blossom;
 
 public record UnitTeleportPayloadS2C(boolean flag) implements CustomPayload {
     public static final Id<UnitTeleportPayloadS2C> ID = CustomPayload.id("unit_teleport_s2c");
@@ -16,8 +15,7 @@ public record UnitTeleportPayloadS2C(boolean flag) implements CustomPayload {
             UnitTeleportPayloadS2C::flag,
             UnitTeleportPayloadS2C::new
     );
-
-
+    // I notice this one are not using on any where my be it not finish
     public static void send(ServerPlayerEntity player, boolean flag) {
         ServerPlayNetworking.send(player, new UnitTeleportPayloadS2C(flag));
     }
