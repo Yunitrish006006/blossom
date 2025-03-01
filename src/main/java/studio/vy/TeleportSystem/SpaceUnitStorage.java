@@ -31,8 +31,19 @@ public class SpaceUnitStorage{
         }
     }
 
+    public void clearAndSetUnits(List<SpaceUnit> units) {
+        config.units.clear();
+        config.units.addAll(units);
+        write();
+    }
+
     public void addUnit(SpaceUnit unit) {
         config.units.add(unit);
+        write();
+    }
+
+    public void removeUnit(SpaceUnit unit) {
+        config.units.remove(unit);
         write();
     }
 

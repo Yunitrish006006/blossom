@@ -6,10 +6,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
-import studio.vy.TeleportSystem.ModKeybinds;
-import studio.vy.TeleportSystem.SpaceUnit;
-import studio.vy.TeleportSystem.UnitScreen;
-import studio.vy.TeleportSystem.UnitTeleportPayloadS2C;
+import studio.vy.TeleportSystem.*;
 
 import java.util.ArrayList;
 
@@ -19,6 +16,14 @@ public class BlossomClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(UnitTeleportPayloadS2C.ID, new UnitTeleportPayloadS2C.Receiver());
+
+        // 添加同步資料的接收器
+        ClientPlayNetworking.registerGlobalReceiver(SpaceUnitSyncPayloadS2C.ID, (payload, context) -> {
+            if (CreateUnitScreen.storage != null) {
+                // 清空現有資料並更新為伺服器傳來的資料
+                CreateUnitScreen.storage.clearAndSetUnits(payload.units());
+            }
+        });
 
         ModKeybinds.register();
 

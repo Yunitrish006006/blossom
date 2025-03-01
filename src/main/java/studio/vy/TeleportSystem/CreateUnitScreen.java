@@ -73,18 +73,15 @@ public class CreateUnitScreen extends Screen {
             double y = client.player.getY();
             double z = client.player.getZ();
             String dimension = client.player.getWorld().getRegistryKey().getValue().toString();
-//            if (client.isInSingleplayer()) {
-                storage.addUnit(new SpaceUnit(name, x, y, z, dimension, client.player.getUuid()));
-//            }
-//            else {
-//                sendCreateUnitPacket(name, x, y, z, dimension);
-//            }
+            SpaceUnit unit = new SpaceUnit(name, x, y, z, dimension, client.player.getUuid());
+
+            if (client.isInSingleplayer()) {
+                storage.addUnit(unit);
+            } else {
+                ServerSpaceUnitPayloadC2S.send("add", unit);
+            }
             client.setScreen(parent);
         }
-    }
-
-    private void sendCreateUnitPacket(String name, double x, double y, double z, String dimension) {
-
     }
 
 

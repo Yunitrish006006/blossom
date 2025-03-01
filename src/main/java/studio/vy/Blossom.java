@@ -21,7 +21,6 @@ public class Blossom implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModPayload.init();
-		ServerPlayNetworking.registerGlobalReceiver(UnitTeleportPayloadC2S.ID, new UnitTeleportPayloadC2S.Receiver());
 		LOGGER.info("initializing mod");
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();

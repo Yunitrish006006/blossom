@@ -19,6 +19,10 @@ public class UnitScreen extends Screen {
         super(Text.translatable("gui.blossom.teleport.title"));
     }
 
+    public void initialize() {
+        init();
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -51,7 +55,28 @@ public class UnitScreen extends Screen {
                     .build()
             );
 
+            // Delete button
+            this.addDrawableChild(ButtonWidget.builder(
+                            Text.translatable("gui.blossom.teleport.delete"),
+                            button -> deleteUnit(unit))
+                    .dimensions(this.width / 2 - BUTTON_WIDTH / 2 + BUTTON_WIDTH/3 + 5, y, BUTTON_WIDTH/3, BUTTON_HEIGHT)
+                    .build()
+            );
+
             y += BUTTON_HEIGHT + 5;
+        }
+    }
+
+    private void deleteUnit(SpaceUnit unit) {
+        assert client != null;
+        if (client.player != null && unit.owner().equals(client.player.getUuid())) {
+            if (client.isInSingleplayer()) {
+                CreateUnitScreen.storage.removeUnit(unit);
+                this.initialize(); // 單人遊戲直接重新整理
+            } else {
+                ServerSpaceUnitPayloadC2S.send("remove", unit);
+                // 多人遊戲等待伺服器回應後重新整理
+            }
         }
     }
 
