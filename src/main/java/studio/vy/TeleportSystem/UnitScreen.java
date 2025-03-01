@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -22,7 +23,12 @@ public class UnitScreen extends Screen {
     protected void init() {
         super.init();
         units.clear();
-        units.addAll(CreateUnitScreen.storage.getAllUnits());
+//        units.addAll(CreateUnitScreen.storage.getAllUnits());
+        if (client != null) {
+            if (client.player != null) {
+                units.addAll(CreateUnitScreen.storage.getOwnedUnits(client.player.getUuid()));
+            }
+        }
         // Add Create button at the top
         this.addDrawableChild(ButtonWidget.builder(
                         Text.translatable("gui.blossom.teleport.create_new_unit"),
@@ -52,17 +58,17 @@ public class UnitScreen extends Screen {
     private void teleport(SpaceUnit unit) {
         assert client != null;
         if (client.isInSingleplayer()) {
-            if (client.player != null) {
-                unit.teleport(client.player);
+            if (client.player != null && client.getServer() != null) {
+                ServerPlayerEntity serverPlayer = client.getServer().getPlayerManager().getPlayer(client.player.getUuid());
+                if (serverPlayer != null) {
+                    unit.teleport(serverPlayer);
+                }
                 client.player.closeScreen();
             }
         }
         else {
-            sendTeleportPacket(unit);
+            UnitTeleportPayloadC2S.send(unit);
         }
-    }
-
-    private void sendTeleportPacket(SpaceUnit unit) {
     }
 
     @Override

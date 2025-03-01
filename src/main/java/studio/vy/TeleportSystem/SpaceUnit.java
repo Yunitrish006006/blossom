@@ -1,6 +1,8 @@
 package studio.vy.TeleportSystem;
 
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 
@@ -13,7 +15,7 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         this(name, x, y, z, dimension, owner, List.of(owner), List.of(owner));
     }
 
-    public void teleport(ClientPlayerEntity player) {
+    public void teleport(ServerPlayerEntity player) {
         UUID id = player.getUuid();
         if (owner.equals(id) || admin.contains(id) || allowed.contains(id)) {
             Vec3d pos = player.getPos();
