@@ -20,8 +20,12 @@ public class BlossomClient implements ClientModInitializer {
         // 添加同步資料的接收器
         ClientPlayNetworking.registerGlobalReceiver(SpaceUnitSyncPayloadS2C.ID, (payload, context) -> {
             if (CreateUnitScreen.storage != null) {
-                // 清空現有資料並更新為伺服器傳來的資料
-                CreateUnitScreen.storage.clearAndSetUnits(payload.units());
+                context.client().execute(() -> {
+                    // 清空現有資料並更新為伺服器傳來的資料
+                    CreateUnitScreen.storage.clearAndSetUnits(payload.units());
+                    // 重新整理畫面
+                    UnitScreen.refresh();
+                });
             }
         });
 

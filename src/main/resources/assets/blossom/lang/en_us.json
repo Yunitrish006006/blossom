@@ -15,5 +15,6 @@
   "gui.blossom.teleport.teleport": "Teleport",
   "gui.blossom.teleport.cancel": "Cancel",
   "gui.blossom.teleport.create": "Create",
+  "gui.blossom.teleport.delete": "Delete",
   "gui.blossom.teleport.create_new_unit": "Create New Unit"
 }

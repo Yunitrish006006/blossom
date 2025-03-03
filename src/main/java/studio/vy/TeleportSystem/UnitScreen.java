@@ -14,13 +14,22 @@ public class UnitScreen extends Screen {
     private final List<SpaceUnit> units = new ArrayList<>();
     private static final int BUTTON_WIDTH = 200;
     private static final int BUTTON_HEIGHT = 20;
+    private static UnitScreen currentScreen;
 
     public UnitScreen() {
         super(Text.translatable("gui.blossom.teleport.title"));
     }
 
-    public void initialize() {
-        init();
+    @Override
+    public void close() {
+        currentScreen = null;
+        super.close();
+    }
+
+    public static void refresh() {
+        if (currentScreen != null) {
+            currentScreen.init();
+        }
     }
 
     @Override
@@ -72,7 +81,7 @@ public class UnitScreen extends Screen {
         if (client.player != null && unit.owner().equals(client.player.getUuid())) {
             if (client.isInSingleplayer()) {
                 CreateUnitScreen.storage.removeUnit(unit);
-                this.initialize(); // 單人遊戲直接重新整理
+                refresh(); // 單人遊戲直接重新整理
             } else {
                 ServerSpaceUnitPayloadC2S.send("remove", unit);
                 // 多人遊戲等待伺服器回應後重新整理

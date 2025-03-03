@@ -4,8 +4,14 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ChunkTicketType;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,18 +47,46 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         this(name, x, y, z, dimension, owner, List.of(owner), List.of(owner));
     }
 
+    public BlockPos getBlock() {
+        return BlockPos.ofFloored(x,y,z);
+    }
+
+    public ChunkPos getChunk(ServerWorld world) {
+        return world.getChunk(BlockPos.ofFloored(x,y,z)).getPos();
+    }
+
+    public boolean isChunkLoaded(ServerWorld world) {
+        return world.isChunkLoaded(getChunk(world).x, getChunk(world).z);
+    }
+
+    public boolean loadChunk(ServerWorld world) {
+        if (isChunkLoaded(world)) return true;
+        world.getChunkManager().addTicket(ChunkTicketType.PORTAL, getChunk(world), 1, null);
+        return true;
+    }
+
+    public void unloadChunk(ServerWorld world) {
+        if (!isChunkLoaded(world)) return;
+        world.getChunkManager().removeTicket(ChunkTicketType.PORTAL, getChunk(world), 1, null);
+    }
+
     public void teleport(ServerPlayerEntity player) {
         UUID id = player.getUuid();
         if (owner.equals(id) || admin.contains(id) || allowed.contains(id)) {
-            Vec3d pos = player.getPos();
-            if (player.teleport(x, y, z, true)) {
-                player.sendMessage(Text.of("Traveled for " + Math.sqrt(Math.pow(x - pos.x, 2) + Math.pow(y - pos.y, 2) + Math.pow(z - pos.z, 2)) + " blocks"), false);
-            } else {
-                player.sendMessage(Text.of("Teleport failed - make sure the destination is loaded"), false);
+            Vec3d from = player.getPos();
+            Vec3d to = new Vec3d(x, y, z);
+            ServerWorld world = player.getServerWorld();
+            if (loadChunk(world)) {
+                if (player.teleport(x, y, z, true)) {
+                    player.sendMessage(Text.translatable("teleport to chunk " + getChunk(world).x + " " + getChunk(world).z + " from " + player.getChunkPos().x + " " + player.getChunkPos()), true);
+                    player.sendMessage(Text.translatable("Traveled for " + from.distanceTo(to) + " blocks"), true);
+                } else {
+                    player.sendMessage(Text.translatable("Teleport failed - make sure the destination is loaded"), true);
+                }
             }
         }
         else {
-            player.sendMessage(Text.of("You are not allowed to teleport to this unit"), false);
+            player.sendMessage(Text.of("You are not allowed to teleport to this unit"), true);
         }
     }
 }

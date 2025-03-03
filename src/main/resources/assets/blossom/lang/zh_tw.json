@@ -15,5 +15,6 @@
   "gui.blossom.teleport.teleport": "傳送",
   "gui.blossom.teleport.cancel": "取消",
   "gui.blossom.teleport.create": "建立傳送節點",
+  "gui.blossom.teleport.delete": "刪除節點",
   "gui.blossom.teleport.create_new_unit": "新增傳送單元"
 }

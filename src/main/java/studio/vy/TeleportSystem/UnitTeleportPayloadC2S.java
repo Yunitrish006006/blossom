@@ -5,11 +5,6 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.text.Text;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 public record UnitTeleportPayloadC2S(SpaceUnit unit) implements CustomPayload {
 
@@ -33,7 +28,6 @@ public record UnitTeleportPayloadC2S(SpaceUnit unit) implements CustomPayload {
         @Override
         public void receive(UnitTeleportPayloadC2S payload, ServerPlayNetworking.Context context) {
             if(context.player() != null){
-                context.player().sendMessage(Text.translatable("Receive package"), false);
                 payload.unit().teleport(context.player());
             }
         }
