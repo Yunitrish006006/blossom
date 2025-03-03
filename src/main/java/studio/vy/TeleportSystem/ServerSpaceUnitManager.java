@@ -1,7 +1,6 @@
 package studio.vy.TeleportSystem;
 
 import com.google.gson.Gson;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 
 import java.io.File;
@@ -17,8 +16,7 @@ public class ServerSpaceUnitManager {
     private SpaceUnitConfig config;
 
     private ServerSpaceUnitManager(MinecraftServer server) {
-        this.file = new File(FabricLoader.getInstance().getConfigDir()+"/ServerUnits.json");
-        System.out.println(file.getAbsolutePath());
+        this.file = new File(server.getRunDirectory()+"/config/units.json");
         if (file.exists()) {
             config = read();
         } else {
@@ -74,37 +72,10 @@ public class ServerSpaceUnitManager {
         }
     }
 
-    public String beautify(String string) {
-        StringBuilder temp = new StringBuilder();
-        int tabCounter = 0;
-        char[] array = string.toCharArray();
-        for (int i = 0; i < array.length; i++) {
-            char it = array[i];
-            if (it == '{' || it == '[') {
-                tabCounter += 1;
-                temp.append(it).append("\n");
-                if (tabCounter > 0) temp.append("\t".repeat(tabCounter));
-            } else if (it == ',') {
-                temp.append(it).append("\n");
-                if (tabCounter > 0) temp.append("\t".repeat(tabCounter));
-            } else {
-                temp.append(it);
-            }
-            if (i + 1 < array.length) {
-                if (array[i + 1] == '}' || array[i + 1] == ']') {
-                    temp.append("\n");
-                    tabCounter -= 1;
-                    if (tabCounter > 0) temp.append("\t".repeat(tabCounter));
-                }
-            }
-        }
-        return temp.toString();
-    }
-
     private void write() {
         try {
             FileWriter writer = new FileWriter(file);
-            writer.write(beautify(new Gson().toJson(config)));
+            writer.write(new Gson().toJson(config));
             writer.close();
         } catch (IOException e) {
             config = new SpaceUnitConfig();

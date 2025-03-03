@@ -77,10 +77,8 @@ public class CreateUnitScreen extends Screen {
 
             if (client.isInSingleplayer()) {
                 storage.addUnit(unit);
-                UnitScreen.refresh(); // 單人模式直接更新
             } else {
                 ServerSpaceUnitPayloadC2S.send("add", unit);
-                // 多人模式等待伺服器回應
             }
             client.setScreen(parent);
         }
