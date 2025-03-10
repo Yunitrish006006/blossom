@@ -1,4 +1,4 @@
-package studio.vy.TeleportSystem;
+package studio.vy.TeleportSystem.screen;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -6,25 +6,17 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
+import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
+import studio.vy.TeleportSystem.SpaceUnit;
+import studio.vy.TeleportSystem.SpaceUnitManager;
 
-import java.io.IOException;
-
-public class CreateUnitScreen extends Screen {
+public class CreateUnit extends Screen {
     private final Screen parent;
     private TextFieldWidget nameField;
     private static final int FIELD_WIDTH = 200;
     private static final int FIELD_HEIGHT = 20;
-    public static SpaceUnitStorage storage;
 
-    static {
-        try {
-            storage = new SpaceUnitStorage();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public CreateUnitScreen(Screen parent) {
+    public CreateUnit(Screen parent) {
         super(Text.translatable("gui.blossom.teleport.create_new_unit"));
         this.parent = parent;
     }
@@ -76,9 +68,9 @@ public class CreateUnitScreen extends Screen {
             SpaceUnit unit = new SpaceUnit(name, x, y, z, dimension, client.player.getUuid());
 
             if (client.isInSingleplayer()) {
-                storage.addUnit(unit);
+                SpaceUnitManager.getClientInstance(client.getServer()).addUnit(unit);
             } else {
-                ServerSpaceUnitPayloadC2S.send("add", unit);
+                UnitPayloadC2S.send("add", unit);
             }
             client.setScreen(parent);
         }

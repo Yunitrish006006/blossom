@@ -2,11 +2,9 @@ package studio.vy;
 
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import studio.vy.TeleportSystem.UnitTeleportPayloadC2S;
 import studio.vy.block.ModBlocks;
 import studio.vy.item.ModItemGroups;
 import studio.vy.item.ModItems;
@@ -20,7 +18,8 @@ public class Blossom implements ModInitializer {
 	}
 	@Override
 	public void onInitialize() {
-		ModPayload.init();
+		ModPayload.initCommon();
+		ModPayload.initServer();
 		LOGGER.info("initializing mod");
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();
