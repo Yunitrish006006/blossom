@@ -21,9 +21,9 @@ public class SpaceUnitManager {
 
     private SpaceUnitManager(MinecraftServer server, boolean isClient) {
         if (isClient) {
-            this.file = new File(FabricLoader.getInstance().getGameDir()+"/Blossom/Units.json");
+            this.file = new File(FabricLoader.getInstance().getGameDir() + "/Blossom/Units.json");
         } else {
-            this.file = new File(FabricLoader.getInstance().getConfigDir()+"/Blossom/ServerUnits.json");
+            this.file = new File(FabricLoader.getInstance().getConfigDir() + "/Blossom/ServerUnits.json");
         }
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
 
@@ -57,7 +57,6 @@ public class SpaceUnitManager {
         }
         return clientInstance;
     }
-
 
     public void addUnit(SpaceUnit unit) {
         config.units.add(unit);
@@ -135,5 +134,4 @@ public class SpaceUnitManager {
                     }
                 });
     }
-
 }

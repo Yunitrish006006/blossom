@@ -38,22 +38,33 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
             if (player != null) {
                 SpaceUnitManager manager = SpaceUnitManager.getServerInstance(player.getServer());
 
-                // 檢查權限
-                if (payload.unit().owner().equals(player.getUuid())) {
-                    switch (payload.operation()) {
-                        case "add" -> manager.addUnit(payload.unit());
-                        case "remove" -> manager.removeUnit(payload.unit());
-                        case "teleport" -> payload.unit.teleport(player);
-                        case "fetch_all" -> {
-                            List<SpaceUnit> allUnits = manager.config.units;
-                            UnitPayloadS2C.send(player, allUnits);
+                switch (payload.operation()) {
+                    case "add" -> {
+                        if (payload.unit().owner().equals(player.getUuid())) {
+                            manager.addUnit(payload.unit());
                         }
                     }
-
-                    // 同步更新到所有在線玩家
-                    for (ServerPlayerEntity onlinePlayer : player.getServer().getPlayerManager().getPlayerList()) {
-                        List<SpaceUnit> visibleUnits = manager.config.getAllowed(onlinePlayer.getUuid());
-                        UnitPayloadS2C.send(onlinePlayer, visibleUnits);
+                    case "remove" -> {
+                        if (payload.unit().owner().equals(player.getUuid())) {
+                            manager.removeUnit(payload.unit());
+                        }
+                    }
+                    case "teleport" -> payload.unit.teleport(player);
+                    case "fetch_owned" -> {
+                        List<SpaceUnit> ownedUnits = manager.config.getOwned(player.getUuid());
+                        UnitPayloadS2C.send(player, ownedUnits);
+                    }
+                    case "fetch_allowed" -> {
+                        List<SpaceUnit> allowedUnits = manager.config.getAllowed(player.getUuid());
+                        UnitPayloadS2C.send(player, allowedUnits);
+                    }
+                    case "fetch_editable" -> {
+                        List<SpaceUnit> editableUnits = manager.config.getEditable(player.getUuid());
+                        UnitPayloadS2C.send(player, editableUnits);
+                    }
+                    case "fetch_all" -> {
+                        List<SpaceUnit> allUnits = manager.config.units;
+                        UnitPayloadS2C.send(player, allUnits);
                     }
                 }
             }

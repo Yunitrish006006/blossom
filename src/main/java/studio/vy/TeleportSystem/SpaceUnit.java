@@ -3,10 +3,12 @@ package studio.vy.TeleportSystem;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 
@@ -46,14 +48,9 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         List<UUID> allowed = packetByteBuf.readCollection(ArrayList::new, buffer -> buffer.readUuid());
         return new SpaceUnit(name, x, y, z, dimension, owner, admin, allowed);
     }
+
     public SpaceUnit(String name, double x, double y, double z, String dimension, UUID owner) {
         this(name, x, y, z, dimension, owner, List.of(owner), List.of(owner));
-    }
-
-    public boolean loadChunk(ServerWorld world, ChunkPos pos) {
-        if (world.isChunkLoaded(pos.x, pos.z)) return true;
-        world.getChunkManager().addTicket(ChunkTicketType.PLAYER, pos, 1 , pos);
-        return world.isChunkLoaded(pos.x, pos.z);
     }
 
     public ChunkPos getChunkPos() {
@@ -64,8 +61,12 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         return player.getServerWorld();
     }
 
-    public Vec3d getPos() {
+    public Vec3d getVecPos() {
         return new Vec3d(x, y, z);
+    }
+
+    public BlockPos getBlockPos() {
+        return BlockPos.ofFloored(x,y,x);
     }
 
     public void teleport(ServerPlayerEntity player) {
@@ -77,28 +78,41 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
 
         ServerWorld world = getWorld(player);
         ChunkPos chunkPos = getChunkPos();
-        player.sendMessage(Text.of("Loading chunk " + chunkPos.x + " " + chunkPos.z), true);
-        player.sendMessage(Text.of("Teleporting in 3 seconds..."), true);
-        world.getServer().execute(() -> loadChunk(world, chunkPos));
-        world.getServer().execute(() -> {
-            try {
-                Thread.sleep(3000);
-                Vec3d from = player.getPos();
-                Vec3d destination = getPos();
-                if (player.teleport(x, y, z, true)) {
-                    player.sendMessage(Text.of("Traveled for " + from.distanceTo(destination) + " blocks"), true);
-                } else {
-                    player.sendMessage(Text.of("Teleport failed... retrying"), true);
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        Vec3d from = player.getPos();
+        Vec3d destination = getVecPos();
 
-        });
-//        if (loadChunk(world, chunkPos)) {
-//
-//        } else {
-//            player.sendMessage(Text.of("Teleport failed, please retry"), true);
-//        }
+        // 改用計時器線程實現倒數
+        new Thread(() -> {
+            try {
+                for (int i = 3; i > 0; i--) {
+                    final int count = i;
+                    player.getServer().submit(() ->
+                            player.sendMessage(Text.of("Teleporting in " + count + "..."), true)
+                    );
+                    Thread.sleep(1000);
+                }
+
+                // 倒數結束後執行傳送
+                player.getServer().submitAndJoin(() -> {
+                    loadChunk(world, chunkPos);
+                    if (player.teleport(world, x, y, z, PositionFlag.getFlags(0), player.getYaw(), player.getPitch(), true)) {
+                        player.sendMessage(Text.of("Traveled for " + from.distanceTo(destination) + " blocks"), true);
+                    } else {
+                        player.sendMessage(Text.of("Teleport failed"), true);
+                    }
+                });
+            } catch (Exception e) {
+                player.sendMessage(Text.of("Teleport cancelled"), true);
+            }
+        }).start();
+    }
+
+    public void loadChunk(ServerWorld world, ChunkPos pos) {
+        world.getChunkManager().addTicket(
+                ChunkTicketType.PORTAL,
+                pos,
+                1,
+                getBlockPos()
+        );
     }
 }

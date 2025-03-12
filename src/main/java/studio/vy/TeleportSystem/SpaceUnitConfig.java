@@ -3,6 +3,7 @@ package studio.vy.TeleportSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class SpaceUnitConfig {
     public List<SpaceUnit> units = new ArrayList<>();
@@ -18,17 +19,7 @@ public class SpaceUnitConfig {
     }
 
     public List<SpaceUnit> getOwned(UUID id) {
-        List<SpaceUnit> temp = new ArrayList<>();
-        for (SpaceUnit unit : units) {
-            if (unit.owner().equals(id)) {
-                System.out.println("owned:"+ unit.name());
-                temp.add(unit);
-            }
-            else {
-                System.out.println("not owned:"+ unit.name());
-            }
-        }
-        return temp;
+        return units.stream().filter(unit -> unit.owner().equals(id)).collect(Collectors.toList());
     }
 
     public List<SpaceUnit> getEditable(UUID id) {

@@ -15,5 +15,12 @@
   "gui.blossom.teleport.teleport": "傳送",
   "gui.blossom.teleport.cancel": "取消",
   "gui.blossom.teleport.create": "建立傳送節點",
-  "gui.blossom.teleport.create_new_unit": "新增傳送單元"
+  "gui.blossom.teleport.create_new_unit": "新增傳送單元",
+  "gui.blossom.teleport.owned_units": "自家傳送點",
+  "gui.blossom.teleport.all_units": "全部傳送點",
+  "gui.blossom.teleport.edit": "修改",
+  "gui.blossom.teleport.delete": "刪除",
+  "gui.blossom.teleport.add_player": "加入玩家",
+  "gui.blossom.teleport.edit_permission": "修改權限",
+  "gui.blossom.teleport.back": "回上頁"
 }

@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
 import studio.vy.TeleportSystem.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
+import studio.vy.TeleportSystem.payload.UnitPayloadS2C;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,18 +25,6 @@ public class UnitList extends Screen {
         this.units = units;
     }
 
-    public void refresh(List<SpaceUnit> units) {
-        this.units = new ArrayList<>();
-        init();
-        if (units==null) {
-            this.units.add(new SpaceUnit("world_spawn", 0, 0, 0, "minecraft:overworld", MinecraftClient.getInstance().player.getUuid()));
-        }
-        else {
-            this.units.clear();
-            this.units.addAll(units);
-        }
-    }
-
     private void editPermission(SpaceUnit unit) {
         assert client != null;
         if (client.player != null && unit.owner().equals(client.player.getUuid())) {
@@ -46,20 +35,25 @@ public class UnitList extends Screen {
     private ButtonWidget createNewUnitButton(int y) {
         return ButtonWidget.builder(
                         Text.translatable("gui.blossom.teleport.create_new_unit"),
-                        button -> {
-                            MinecraftClient.getInstance().setScreen(new CreateUnit(this));
-                        })
+                        button -> MinecraftClient.getInstance().setScreen(new CreateUnit(this)))
                 .dimensions(this.width / 2 - BUTTON_WIDTH / 2, y, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build();
     }
 
     private ButtonWidget teleportUnitButton(SpaceUnit unit, int y) {
+        return teleportUnitButton(unit,8,y);
+    }
+
+    private ButtonWidget teleportUnitButton(SpaceUnit unit, int grid_x, int y) {
         return ButtonWidget.builder(
                         Text.literal(unit.name()),
-                        button -> {
-                            teleport(unit);
-                        })
-                .dimensions(this.width / 2 - BUTTON_WIDTH / 2, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+                        button -> teleport(unit))
+                .dimensions(
+                        this.width*grid_x / 16 - BUTTON_WIDTH / 2,
+                        y,
+                        BUTTON_WIDTH / 3 - 5,
+                        BUTTON_HEIGHT
+                )
                 .build();
     }
 
@@ -67,7 +61,12 @@ public class UnitList extends Screen {
         return ButtonWidget.builder(
                         Text.translatable("gui.blossom.teleport.delete"),
                         button -> deleteUnit(unit))
-                .dimensions(this.width / 2 - BUTTON_WIDTH / 2 + BUTTON_WIDTH/3 + 5, y, BUTTON_WIDTH/3, BUTTON_HEIGHT)
+                .dimensions(
+                        this.width / 2 - BUTTON_WIDTH / 2 + 2 * (BUTTON_WIDTH / 3) + 5,
+                        y,
+                        BUTTON_WIDTH / 3 - 5,
+                        BUTTON_HEIGHT
+                )
                 .build();
     }
 
@@ -75,87 +74,126 @@ public class UnitList extends Screen {
         return ButtonWidget.builder(
                         Text.translatable("gui.blossom.teleport.edit"),
                         button -> editPermission(unit))
-                .dimensions(this.width / 2 - BUTTON_WIDTH / 2 + BUTTON_WIDTH/3 + 5, y, BUTTON_WIDTH/3, BUTTON_HEIGHT)
+                .dimensions(
+                        this.width / 2 - BUTTON_WIDTH / 2 + (BUTTON_WIDTH / 3),
+                        y,
+                        BUTTON_WIDTH / 3 - 5,
+                        BUTTON_HEIGHT
+                )
                 .build();
     }
 
+    private void renderPageButtonRow() {
+        this.addDrawableChild(ButtonWidget.builder(
+                        Text.translatable("gui.blossom.teleport.owned_units"),
+                        button -> {
+                            page = "owned";
+                            fetchOwnedUnits();
+                            clearAndInit();
+                        }
+                ).dimensions(this.width / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
+                .build());
+
+        this.addDrawableChild(ButtonWidget.builder(
+                        Text.translatable("gui.blossom.teleport.all_units"),
+                        button -> {
+                            page = "all";
+                            fetchAllUnits();
+                            clearAndInit();
+                        }
+                ).dimensions(this.width*2 / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
+                .build());
+        this.addDrawableChild(ButtonWidget.builder(
+                        Text.translatable("gui.blossom.teleport.allowed_units"),
+                        button -> {
+                            page = "allowed";
+                            fetchAllUnits();
+                            clearAndInit();
+                        }
+                ).dimensions(this.width*3 / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
+                .build());
+    }
+
     private void renderOwnUnitPage() {
-        int y = 50;
+        int y = 50; // 統一起始位置
         this.addDrawableChild(createNewUnitButton(y));
-        y+=20;
+        y += BUTTON_HEIGHT + 5;
+
         for (SpaceUnit unit : units) {
             this.addDrawableChild(teleportUnitButton(unit, y));
-            this.addDrawableChild(deleteUnitButton(unit, y));
             this.addDrawableChild(editUnitButton(unit, y));
+            this.addDrawableChild(deleteUnitButton(unit, y));
             y += BUTTON_HEIGHT + 5;
         }
     }
 
-    private void renderPageButtonRow() {
-        this.addDrawableChild(
-                this.addDrawableChild(ButtonWidget.builder(
-                        Text.translatable("gui.blossom.teleport.owned_units"),
-                        button -> {
-                            page = "owned";
-                            clearAndInit();
-                        }
-                        )
-                        .dimensions(this.width / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
-                        .build()
-                )
-        );
-        this.addDrawableChild(
-                this.addDrawableChild(ButtonWidget.builder(
-                                        Text.translatable("gui.blossom.teleport.all_units"),
-                                        button -> {
-                                            page = "all";
-                                            clearAndInit();
-                                        }
-                                )
-                                .dimensions(this.width / 2 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
-                                .build()
-                )
-        );
-    }
-
     private void renderAllUnitPage() {
+        System.out.println("rendering all units");
         int y = 70;
+        int grid_x = 4;
         for (SpaceUnit unit : units) {
-            this.addDrawableChild(teleportUnitButton(unit, y));
+            this.addDrawableChild(teleportUnitButton(unit, grid_x, y));
             y += BUTTON_HEIGHT + 5;
+            if (y > this.height - 50) {
+                y = 70;
+                grid_x += 3;
+            }
         }
     }
 
     private void fetchAllUnits() {
-        if (client != null && client.player != null) {
-            if (client.isInSingleplayer()) {
-                SpaceUnitManager manager = SpaceUnitManager.getClientInstance(client.getServer());
-                units = manager.getAllUnits();
-            } else {
-                UnitPayloadC2S.send("fetch_all", null);
-            }
+        if (client==null) return;
+        if (!client.isInSingleplayer()) {
+            UnitPayloadC2S.send("fetch_all", null);
+        } else if (client.player != null) {
+            SpaceUnitManager manager = SpaceUnitManager.getClientInstance(client.getServer());
+            units = manager.config.units;
+        }
+    }
+
+    private void fetchAllowedUnits() {
+        if (client==null) return;
+        if (!client.isInSingleplayer()) {
+            UnitPayloadC2S.send("fetch_allowed", null);
+        } else if (client.player != null) {
+            SpaceUnitManager manager = SpaceUnitManager.getClientInstance(client.getServer());
+            units = manager.config.getAllowed(client.player.getUuid());
+        }
+    }
+
+    private void fetchOwnedUnits() {
+        if (client==null) return;
+        if (!client.isInSingleplayer()) {
+            UnitPayloadC2S.send("fetch_owned", null);
+        } else if (client.player != null) {
+            SpaceUnitManager manager = SpaceUnitManager.getClientInstance(client.getServer());
+            units = manager.config.getOwned(client.player.getUuid());
+        }
+    }
+
+    public void refresh(List<SpaceUnit> newUnits) {
+        if (!this.units.equals(newUnits)) {
+            this.units = newUnits;
+            this.clearAndInit();
         }
     }
 
     @Override
     protected void init() {
         super.init();
+        if (units.isEmpty()) {
+            switch (page) {
+                case "owned" -> fetchOwnedUnits();
+                case "all" -> fetchAllUnits();
+                case "allowed" -> fetchAllowedUnits();
+            }
+        }
         renderPageButtonRow();
-        System.out.println("Current page:" + page);
         switch (page) {
-            case "owned":
-                renderOwnUnitPage();
-                break;
-            case "admin":
-                // renderAdminUnitPage();
-                break;
-            case "allowed":
-                // renderAllowedUnitPage();
-                break;
-            case "all":
-                fetchAllUnits();
-                renderAllUnitPage();
-                break;
+            case "owned" -> renderOwnUnitPage();
+            case "admin" -> {}
+            case "allowed" -> {}
+            case "all" -> renderAllUnitPage();
         }
     }
 
@@ -165,7 +203,7 @@ public class UnitList extends Screen {
             if (client.isInSingleplayer()) {
                 SpaceUnitManager.getClientInstance(client.getServer()).removeUnit(unit);
                 units.remove(unit);
-                refresh(units);
+                init();
             } else {
                 UnitPayloadC2S.send("remove", unit);
             }

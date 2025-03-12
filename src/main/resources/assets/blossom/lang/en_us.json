@@ -14,6 +14,13 @@
   "gui.blossom.teleport.title": "Teleport",
   "gui.blossom.teleport.teleport": "Teleport",
   "gui.blossom.teleport.cancel": "Cancel",
+  "gui.blossom.teleport.add_player": "Add Player",
+  "gui.blossom.teleport.edit_permission": "Edit Permission",
+  "gui.blossom.teleport.back": "Back",
   "gui.blossom.teleport.create": "Create",
-  "gui.blossom.teleport.create_new_unit": "Create New Unit"
+  "gui.blossom.teleport.edit": "Edit",
+  "gui.blossom.teleport.delete": "Delete",
+  "gui.blossom.teleport.create_new_unit": "Create New Unit",
+  "gui.blossom.teleport.owned_units": "Owned Units",
+  "gui.blossom.teleport.all_units": "All Units"
 }
