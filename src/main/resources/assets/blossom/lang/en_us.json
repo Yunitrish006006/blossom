@@ -22,5 +22,6 @@
   "gui.blossom.teleport.delete": "Delete",
   "gui.blossom.teleport.create_new_unit": "Create New Unit",
   "gui.blossom.teleport.owned_units": "Owned Units",
+  "gui.blossom.teleport.allowed_units": "Allowed Units",
   "gui.blossom.teleport.all_units": "All Units"
 }

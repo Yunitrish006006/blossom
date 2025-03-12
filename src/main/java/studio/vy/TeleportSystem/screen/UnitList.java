@@ -107,7 +107,7 @@ public class UnitList extends Screen {
                         Text.translatable("gui.blossom.teleport.allowed_units"),
                         button -> {
                             page = "allowed";
-                            fetchAllUnits();
+                            fetchAllowedUnits();
                             clearAndInit();
                         }
                 ).dimensions(this.width*3 / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
@@ -127,8 +127,20 @@ public class UnitList extends Screen {
         }
     }
 
+    private void renderAllowedUnitPage() {
+        int y = 70;
+        int grid_x = 4;
+        for (SpaceUnit unit : units) {
+            this.addDrawableChild(teleportUnitButton(unit, grid_x, y));
+            y += BUTTON_HEIGHT + 5;
+            if (y > this.height - 50) {
+                y = 70;
+                grid_x += 3;
+            }
+        }
+    }
+
     private void renderAllUnitPage() {
-        System.out.println("rendering all units");
         int y = 70;
         int grid_x = 4;
         for (SpaceUnit unit : units) {
@@ -184,15 +196,16 @@ public class UnitList extends Screen {
         if (units.isEmpty()) {
             switch (page) {
                 case "owned" -> fetchOwnedUnits();
-                case "all" -> fetchAllUnits();
+                case "admin" -> {}
                 case "allowed" -> fetchAllowedUnits();
+                case "all" -> fetchAllUnits();
             }
         }
         renderPageButtonRow();
         switch (page) {
             case "owned" -> renderOwnUnitPage();
             case "admin" -> {}
-            case "allowed" -> {}
+            case "allowed" -> renderAllowedUnitPage();
             case "all" -> renderAllUnitPage();
         }
     }

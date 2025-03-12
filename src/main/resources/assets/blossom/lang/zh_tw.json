@@ -22,5 +22,6 @@
   "gui.blossom.teleport.delete": "刪除",
   "gui.blossom.teleport.add_player": "加入玩家",
   "gui.blossom.teleport.edit_permission": "修改權限",
-  "gui.blossom.teleport.back": "回上頁"
+  "gui.blossom.teleport.back": "回上頁",
+  "gui.blossom.teleport.allowed_units": "有權限的傳送點"
 }
