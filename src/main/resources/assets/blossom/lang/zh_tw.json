@@ -10,6 +10,7 @@
 
   "key.categories.blossom": "綻",
   "key.blossom.open_unit_screen": "打開傳送點介面",
+  "key.blossom.flight": "切換飛行模式",
 
   "gui.blossom.teleport.title": "傳送介面",
   "gui.blossom.teleport.teleport": "傳送",
@@ -23,5 +24,11 @@
   "gui.blossom.teleport.add_player": "加入玩家",
   "gui.blossom.teleport.edit_permission": "修改權限",
   "gui.blossom.teleport.back": "回上頁",
-  "gui.blossom.teleport.allowed_units": "有權限的傳送點"
+  "gui.blossom.teleport.allowed_units": "可傳送點",
+  "gui.blossom.teleport.teammate": "傳送到隊友",
+  "gui.blossom.teleport.request": "傳送請求",
+  "gui.blossom.teleport.accept": "接受",
+  "gui.blossom.teleport.reject": "拒絕",
+  "gui.blossom.teleport.request.message": "%s 請求傳送到你的位置",
+  "gui.blossom.teleport.rejected": "%s 拒絕了你的傳送請求"
 }

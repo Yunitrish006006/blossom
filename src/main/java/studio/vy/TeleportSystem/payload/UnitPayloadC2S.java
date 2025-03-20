@@ -7,10 +7,11 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
-import studio.vy.TeleportSystem.SpaceUnit;
+import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
 import java.util.List;
+import java.util.UUID;
 
 public record UnitPayloadC2S(String operation, SpaceUnit unit) implements CustomPayload {
     public static final Id<UnitPayloadC2S> ID = CustomPayload.id("server_space_unit");
@@ -65,6 +66,27 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
                     case "fetch_all" -> {
                         List<SpaceUnit> allUnits = manager.config.units;
                         UnitPayloadS2C.send(player, allUnits);
+                    }
+                    case "temp_teleport" -> {
+                        manager.addUnit(payload.unit());
+                        payload.unit().teleport(player);
+                        manager.removeUnit(payload.unit());
+                    }
+                    case "request_teleport" -> {
+                        UUID targetId = payload.unit().allowed().get(0);
+                        ServerPlayerEntity targetPlayer = player.getServer().getPlayerManager().getPlayer(targetId);
+                        if (targetPlayer != null) {
+                            // 發送確認請求給目標玩家
+                            UnitPayloadS2C.send(
+                                    targetPlayer,
+                                    List.of(new SpaceUnit(
+                                            "request",
+                                            player.getPos(),
+                                            player.getWorld().getRegistryKey().getValue().toString(),
+                                            player.getUuid()
+                                    ))
+                            );
+                        }
                     }
                 }
             }

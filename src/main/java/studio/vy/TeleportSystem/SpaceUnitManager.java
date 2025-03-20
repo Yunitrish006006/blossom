@@ -2,8 +2,8 @@ package studio.vy.TeleportSystem;
 
 import com.google.gson.Gson;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.MinecraftServer;
+import studio.vy.TeleportSystem.Component.SpaceUnit;
 
 import java.io.File;
 import java.io.FileReader;

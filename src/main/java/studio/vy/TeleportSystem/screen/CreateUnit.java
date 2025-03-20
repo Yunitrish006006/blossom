@@ -7,7 +7,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
-import studio.vy.TeleportSystem.SpaceUnit;
+import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
 public class CreateUnit extends Screen {

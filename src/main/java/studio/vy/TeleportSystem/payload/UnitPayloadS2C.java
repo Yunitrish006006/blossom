@@ -2,12 +2,12 @@ package studio.vy.TeleportSystem.payload;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.loader.impl.lib.sat4j.pb.constraints.UnitBinaryWLClauseConstructor;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
-import studio.vy.TeleportSystem.SpaceUnit;
+import studio.vy.TeleportSystem.Component.SpaceUnit;
+import studio.vy.TeleportSystem.screen.TeleportConfirm;
 import studio.vy.TeleportSystem.screen.UnitList;
 
 import java.util.ArrayList;
@@ -40,9 +40,26 @@ public record UnitPayloadS2C(List<SpaceUnit> units) implements CustomPayload {
     public static class Receiver implements ClientPlayNetworking.PlayPayloadHandler<UnitPayloadS2C> {
         @Override
         public void receive(UnitPayloadS2C payload, ClientPlayNetworking.Context context) {
-            UnitList screen = (UnitList) context.client().currentScreen;
-            if (screen==null) return;
-            screen.refresh(payload.units);
+            context.client().execute(() -> {
+                if (payload.units().get(0).name().equals("request")) {
+                    SpaceUnit request = payload.units().get(0);
+                    ServerPlayerEntity requester = context.client().getServer()
+                            .getPlayerManager()
+                            .getPlayer(request.owner());
+                    ServerPlayerEntity target = context.client().getServer()
+                            .getPlayerManager()
+                            .getPlayer(context.client().player.getUuid());
+
+                    if (requester != null && target != null) {
+                        context.client().setScreen(new TeleportConfirm(requester, target));
+                    }
+                } else {
+                    UnitList screen = (UnitList) context.client().currentScreen;
+                    if (screen != null) {
+                        screen.refresh(payload.units());
+                    }
+                }
+            });
         }
     }
 }

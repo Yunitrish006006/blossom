@@ -1,5 +1,7 @@
 package studio.vy.TeleportSystem;
 
+import studio.vy.TeleportSystem.Component.SpaceUnit;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

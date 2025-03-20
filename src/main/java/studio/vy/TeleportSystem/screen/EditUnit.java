@@ -8,10 +8,9 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import studio.vy.TeleportSystem.PlayerHeadTexture;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
-import studio.vy.TeleportSystem.SpaceUnit;
+import studio.vy.TeleportSystem.Component.SpaceUnit;
 
 import java.util.ArrayList;
 import java.util.List;

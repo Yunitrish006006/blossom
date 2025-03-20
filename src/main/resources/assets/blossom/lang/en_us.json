@@ -10,6 +10,7 @@
 
   "key.categories.blossom": "Blossom",
   "key.blossom.open_unit_screen": "Open Teleport Screen",
+  "key.blossom.flight": "toggle flight",
 
   "gui.blossom.teleport.title": "Teleport",
   "gui.blossom.teleport.teleport": "Teleport",
@@ -23,5 +24,11 @@
   "gui.blossom.teleport.create_new_unit": "Create New Unit",
   "gui.blossom.teleport.owned_units": "Owned Units",
   "gui.blossom.teleport.allowed_units": "Allowed Units",
-  "gui.blossom.teleport.all_units": "All Units"
+  "gui.blossom.teleport.all_units": "All Units",
+  "gui.blossom.teleport.teammate": "Teleport to Teammate",
+  "gui.blossom.teleport.request": "TP Request",
+  "gui.blossom.teleport.accept": "Accept",
+  "gui.blossom.teleport.reject": "Reject",
+  "gui.blossom.teleport.request.message": "%s Requested to TP to your location",
+  "gui.blossom.teleport.rejected": "%s Rejected your TP Request"
 }

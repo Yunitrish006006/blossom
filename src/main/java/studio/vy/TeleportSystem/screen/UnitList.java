@@ -4,14 +4,13 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
-import studio.vy.TeleportSystem.SpaceUnit;
+import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
-import studio.vy.TeleportSystem.payload.UnitPayloadS2C;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UnitList extends Screen {
@@ -84,6 +83,9 @@ public class UnitList extends Screen {
     }
 
     private void renderPageButtonRow() {
+        int x = this.width / 16;
+        int y = 20;
+        int buttonWidth = BUTTON_WIDTH/4;
         this.addDrawableChild(ButtonWidget.builder(
                         Text.translatable("gui.blossom.teleport.owned_units"),
                         button -> {
@@ -91,8 +93,10 @@ public class UnitList extends Screen {
                             fetchOwnedUnits();
                             clearAndInit();
                         }
-                ).dimensions(this.width / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
+                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
                 .build());
+
+        x+=this.width/16+buttonWidth;
 
         this.addDrawableChild(ButtonWidget.builder(
                         Text.translatable("gui.blossom.teleport.all_units"),
@@ -101,8 +105,9 @@ public class UnitList extends Screen {
                             fetchAllUnits();
                             clearAndInit();
                         }
-                ).dimensions(this.width*2 / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
+                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
                 .build());
+        x+=this.width/16+buttonWidth;
         this.addDrawableChild(ButtonWidget.builder(
                         Text.translatable("gui.blossom.teleport.allowed_units"),
                         button -> {
@@ -110,8 +115,36 @@ public class UnitList extends Screen {
                             fetchAllowedUnits();
                             clearAndInit();
                         }
-                ).dimensions(this.width*3 / 4 - BUTTON_WIDTH / 4, 20, BUTTON_WIDTH/4, BUTTON_HEIGHT)
+                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
                 .build());
+    }
+
+    private void renderTeammatePage() {
+        int y = 70;
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.getNetworkHandler() == null) return;
+
+        for (PlayerListEntry entry : client.getNetworkHandler().getPlayerList()) {
+            if (entry.getProfile().getId().equals(client.player.getUuid())) continue;
+
+            ButtonWidget teleportButton = ButtonWidget.builder(
+                    Text.literal("傳送到 " + entry.getProfile().getName()),
+                    button -> {
+                        // 創建一個臨時的 SpaceUnit 來發送請求
+                        SpaceUnit requestUnit = new SpaceUnit(
+                                "request_" + System.currentTimeMillis(),
+                                0, 0, 0, // 座標不重要，因為只是用來傳遞請求
+                                "request",
+                                client.player.getUuid()
+                        );
+                        requestUnit.allowed().add(entry.getProfile().getId());
+                        UnitPayloadC2S.send("request_teleport", requestUnit);
+                    }
+            ).dimensions(width/2 - 100, y, 200, BUTTON_HEIGHT).build();
+
+            this.addDrawableChild(teleportButton);
+            y += BUTTON_HEIGHT + 5;
+        }
     }
 
     private void renderOwnUnitPage() {

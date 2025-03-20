@@ -1,4 +1,4 @@
-package studio.vy.TeleportSystem;
+package studio.vy.TeleportSystem.Component;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.PacketByteBuf;
@@ -52,6 +52,9 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
     public SpaceUnit(String name, double x, double y, double z, String dimension, UUID owner) {
         this(name, x, y, z, dimension, owner, List.of(owner), List.of(owner));
     }
+    public SpaceUnit(String name, Vec3d position, String dimension, UUID owner) {
+        this(name, position.x, position.y, position.z, dimension, owner);
+    }
 
     public ChunkPos getChunkPos() {
         return new ChunkPos((int) x >> 4, (int) z >> 4);
@@ -81,10 +84,12 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         Vec3d from = player.getPos();
         Vec3d destination = getVecPos();
 
-        // 改用計時器線程實現倒數
+        double distance = from.distanceTo(destination);
+        int teleportCost = Math.round((float) ( Math.log(distance) / Math.log(4)));
+
         new Thread(() -> {
             try {
-                for (int i = 3; i > 0; i--) {
+                for (int i = teleportCost; i > 0; i--) {
                     final int count = i;
                     player.getServer().submit(() ->
                             player.sendMessage(Text.of("Teleporting in " + count + "..."), true)
@@ -96,7 +101,7 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
                 player.getServer().submitAndJoin(() -> {
                     loadChunk(world, chunkPos);
                     if (player.teleport(world, x, y, z, PositionFlag.getFlags(0), player.getYaw(), player.getPitch(), true)) {
-                        player.sendMessage(Text.of("Traveled for " + from.distanceTo(destination) + " blocks"), true);
+                        player.sendMessage(Text.of("Traveled for " + distance + " blocks"), true);
                     } else {
                         player.sendMessage(Text.of("Teleport failed"), true);
                     }
