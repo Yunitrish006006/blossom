@@ -1,6 +1,7 @@
 package studio.vy.TeleportSystem.Component;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -11,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +52,15 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
     }
 
     public SpaceUnit(String name, double x, double y, double z, String dimension, UUID owner) {
-        this(name, x, y, z, dimension, owner, List.of(owner), List.of(owner));
+        this(name, x, y, z, dimension, owner,
+                new ArrayList<>(List.of(owner)),
+                new ArrayList<>(List.of(owner)));
     }
+    public SpaceUnit(ServerPlayerEntity player, ServerPlayerEntity requestPlayer) {
+        this("request", player.getX(), player.getY(), player.getZ(), player.getServerWorld().getRegistryKey().getValue().toString(), player.getUuid());
+        this.allowed.add(requestPlayer.getUuid());
+    }
+
     public SpaceUnit(String name, Vec3d position, String dimension, UUID owner) {
         this(name, position.x, position.y, position.z, dimension, owner);
     }
@@ -116,8 +125,7 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         world.getChunkManager().addTicket(
                 ChunkTicketType.PORTAL,
                 pos,
-                1,
-                getBlockPos()
+                1
         );
     }
 }

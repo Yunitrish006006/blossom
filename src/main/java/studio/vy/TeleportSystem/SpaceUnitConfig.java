@@ -23,12 +23,6 @@ public class SpaceUnitConfig {
     }
 
     public List<SpaceUnit> getEditable(UUID id) {
-        List<SpaceUnit> temp = new ArrayList<>();
-        for (SpaceUnit unit : units) {
-            if (unit.owner().equals(id) || unit.admin().contains(id)) {
-                temp.add(unit);
-            }
-        }
-        return temp;
+        return units.stream().filter(spaceUnit -> spaceUnit.owner().equals(id)||spaceUnit.admin().contains(id)).collect(Collectors.toList());
     }
 }

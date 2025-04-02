@@ -122,16 +122,10 @@ public class SpaceUnitManager {
                 .filter(u -> u.equals(unit))
                 .findFirst()
                 .ifPresent(u -> {
-                    List<UUID> newAllowed = new ArrayList<>(u.allowed());
-                    if (!newAllowed.contains(playerUuid)) {
-                        newAllowed.add(playerUuid);
-                        config.units.remove(u);
-                        config.units.add(new SpaceUnit(
-                                u.name(), u.x(), u.y(), u.z(),
-                                u.dimension(), u.owner(), u.admin(), newAllowed
-                        ));
-                        write();
+                    if (!u.allowed().contains(playerUuid)) {
+                        u.allowed().add(playerUuid);
                     }
                 });
+        write();
     }
 }

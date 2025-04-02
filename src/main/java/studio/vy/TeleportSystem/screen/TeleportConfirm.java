@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
@@ -13,16 +12,12 @@ import java.util.UUID;
 
 public class TeleportConfirm extends Screen {
     private final UUID requester;
-    private final String requesterName;
-    private final ServerPlayerEntity requesterPlayer;
-    private final ServerPlayerEntity targetPlayer;
+    private final UUID target;
 
-    public TeleportConfirm(ServerPlayerEntity requester, ServerPlayerEntity target) {
+    public TeleportConfirm(UUID requester, UUID target) {
         super(Text.translatable("gui.blossom.teleport.request"));
-        this.requester = requester.getUuid();
-        this.requesterName = requester.getNameForScoreboard();
-        this.requesterPlayer = requester;
-        this.targetPlayer = target;
+        this.requester = requester;
+        this.target = target;
     }
 
     @Override
@@ -47,36 +42,23 @@ public class TeleportConfirm extends Screen {
     }
 
     private void acceptTeleport() {
-        SpaceUnit tempUnit = new SpaceUnit(
-                UUID.randomUUID().toString(),
-                targetPlayer.getPos(),
-                targetPlayer.getWorld().getRegistryKey().getValue().toString(),
-                targetPlayer.getUuid()
-                );
-
-        // 添加請求者為允許傳送的玩家
-        tempUnit.allowed().add(requester);
-
-        // 發送到服務器創建並傳送
-        UnitPayloadC2S.send("temp_teleport", tempUnit);
+        SpaceUnit tempUnit = SpaceUnit.ERROR;
+        tempUnit.admin().clear();
+        tempUnit.admin().add(requester);
+        tempUnit.allowed().clear();
+        tempUnit.allowed().add(target);
+        UnitPayloadC2S.send("player_teleport", tempUnit);
     }
 
     private void rejectTeleport() {
-        if (!requesterPlayer.isDisconnected()) {
-            requesterPlayer.sendMessage(
-                    Text.translatable("gui.blossom.teleport.rejected", targetPlayer.getNameForScoreboard()),
-                    false
-            );
-        }
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
         context.drawCenteredTextWithShadow(textRenderer,
-                Text.translatable("gui.blossom.teleport.request.message", requesterName).getString(),
+                Text.translatable("gui.blossom.teleport.request.message", requester).getString(),
                 width/2, height/2 - 30, 0xFFFFFF);
         super.render(context, mouseX, mouseY, delta);
     }
-
 }

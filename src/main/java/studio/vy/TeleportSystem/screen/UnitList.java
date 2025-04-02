@@ -12,6 +12,7 @@ import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
 import java.util.List;
+import java.util.UUID;
 
 public class UnitList extends Screen {
     private static final int BUTTON_WIDTH = 200;
@@ -117,45 +118,27 @@ public class UnitList extends Screen {
                         }
                 ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
                 .build());
+        x+=this.width/16+buttonWidth;
+        this.addDrawableChild(ButtonWidget.builder(
+                        Text.translatable("gui.blossom.teleport.players"),
+                        button -> {
+                            page = "players";
+                            clearAndInit();
+                        }
+                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
+                .build());
     }
 
-    private void renderTeammatePage() {
-        int y = 70;
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.getNetworkHandler() == null) return;
-
-        for (PlayerListEntry entry : client.getNetworkHandler().getPlayerList()) {
-            if (entry.getProfile().getId().equals(client.player.getUuid())) continue;
-
-            ButtonWidget teleportButton = ButtonWidget.builder(
-                    Text.literal("傳送到 " + entry.getProfile().getName()),
-                    button -> {
-                        // 創建一個臨時的 SpaceUnit 來發送請求
-                        SpaceUnit requestUnit = new SpaceUnit(
-                                "request_" + System.currentTimeMillis(),
-                                0, 0, 0, // 座標不重要，因為只是用來傳遞請求
-                                "request",
-                                client.player.getUuid()
-                        );
-                        requestUnit.allowed().add(entry.getProfile().getId());
-                        UnitPayloadC2S.send("request_teleport", requestUnit);
-                    }
-            ).dimensions(width/2 - 100, y, 200, BUTTON_HEIGHT).build();
-
-            this.addDrawableChild(teleportButton);
-            y += BUTTON_HEIGHT + 5;
-        }
-    }
-
-    private void renderOwnUnitPage() {
-        int y = 50; // 統一起始位置
+    private void renderEditAbleTypePage(boolean canEdit) {
+        int y = 50;
         this.addDrawableChild(createNewUnitButton(y));
         y += BUTTON_HEIGHT + 5;
-
         for (SpaceUnit unit : units) {
             this.addDrawableChild(teleportUnitButton(unit, y));
-            this.addDrawableChild(editUnitButton(unit, y));
-            this.addDrawableChild(deleteUnitButton(unit, y));
+            if (canEdit) {
+                this.addDrawableChild(editUnitButton(unit, y));
+                this.addDrawableChild(deleteUnitButton(unit, y));
+            }
             y += BUTTON_HEIGHT + 5;
         }
     }
@@ -216,6 +199,48 @@ public class UnitList extends Screen {
         }
     }
 
+    private void renderPlayerPage() {
+        int y = 70;
+        int grid_x = 4;
+        if (client != null && client.getNetworkHandler() != null) {
+            for (PlayerListEntry player : client.getNetworkHandler().getPlayerList()) {
+                // Skip self
+                if (client.player != null && player.getProfile().getId().equals(client.player.getUuid())) {
+                    continue;
+                }
+
+                this.addDrawableChild(ButtonWidget.builder(
+                        Text.literal(player.getProfile().getName()),
+                        button -> requestTeleportToPlayer(player.getProfile().getId())
+                ).dimensions(
+                        this.width * grid_x / 16 - BUTTON_WIDTH / 2,
+                        y,
+                        BUTTON_WIDTH / 3 - 5,
+                        BUTTON_HEIGHT
+                ).build());
+
+                y += BUTTON_HEIGHT + 5;
+                if (y > this.height - 50) {
+                    y = 70;
+                    grid_x += 3;
+                }
+            }
+        }
+    }
+
+    private void requestTeleportToPlayer(UUID targetId) {
+
+        if (client == null || client.player == null) return;
+        SpaceUnit temp = SpaceUnit.ERROR;
+        temp.admin().clear();
+        temp.admin().add(client.player.getUuid());
+        temp.allowed().clear();
+        temp.allowed().add(targetId);
+        UnitPayloadC2S.send("request_teleport", temp);
+        client.setScreen(null);
+    }
+
+
     public void refresh(List<SpaceUnit> newUnits) {
         if (!this.units.equals(newUnits)) {
             this.units = newUnits;
@@ -231,14 +256,16 @@ public class UnitList extends Screen {
                 case "owned" -> fetchOwnedUnits();
                 case "admin" -> {}
                 case "allowed" -> fetchAllowedUnits();
+                case "players" -> units = List.of();
                 case "all" -> fetchAllUnits();
             }
         }
         renderPageButtonRow();
         switch (page) {
-            case "owned" -> renderOwnUnitPage();
+            case "owned" -> renderEditAbleTypePage(true);
             case "admin" -> {}
             case "allowed" -> renderAllowedUnitPage();
+            case "players" -> renderPlayerPage();
             case "all" -> renderAllUnitPage();
         }
     }
