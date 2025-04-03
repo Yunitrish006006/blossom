@@ -31,7 +31,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 offerSmelting(SMELTABLE, RecipeCategory.MISC, Items.IRON_INGOT, 0.25f, 200, "gravel_iron_ore");
                 offerBlasting(SMELTABLE, RecipeCategory.MISC, Items.IRON_INGOT, 0.25f, 100, "gravel_iron_ore");
 
-                offerFoodCookingRecipe("smoking",
+                offerFoodCookingRecipe("smoker",
                         RecipeSerializer.SMOKING,
                         SmokingRecipe::new,
                         100,
@@ -39,7 +39,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         ModItems.COOKED_PUFFERFISH,
                         0.35f);
 
-                offerFoodCookingRecipe("smoking",
+                offerFoodCookingRecipe("smoker",
                         RecipeSerializer.SMOKING,
                         SmokingRecipe::new,
                         100,

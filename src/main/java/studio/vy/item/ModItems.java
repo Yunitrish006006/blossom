@@ -24,10 +24,12 @@ public class ModItems {
 
     public static final Item COPPER_HELMET = register("copper_helmet", (new Item.Settings()).armor(ModArmorMaterials.COPPER, EquipmentType.HELMET));
     public static final Item COPPER_CHESTPLATE = register("copper_chestplate", (new Item.Settings()).armor(ModArmorMaterials.COPPER, EquipmentType.CHESTPLATE));
-    public static final Item COPPER_LEGGINGS = register("copper_helmet", (new Item.Settings()).armor(ModArmorMaterials.COPPER, EquipmentType.LEGGINGS));
+    public static final Item COPPER_LEGGINGS = register("copper_leggings", (new Item.Settings()).armor(ModArmorMaterials.COPPER, EquipmentType.LEGGINGS));
     public static final Item COPPER_BOOTS = register("copper_boots", (new Item.Settings()).armor(ModArmorMaterials.COPPER, EquipmentType.BOOTS));
 
     public static final Item GRAVEL_IRON_ORE = registerBlockItem("gravel_iron_ore", ModBlocks.GRAVEL_IRON_ORE);
+    public static final Item TRASH_CAN = registerBlockItem("trash_can", ModBlocks.TRASH_CAN);
+    public static final Item FISHNET = registerBlockItem("fishnet", ModBlocks.FISHNET);
 
     private static Item registerBlockItem(String name, Block block) {
         return Registry.register(Registries.ITEM, Blossom.identifier(name), new BlockItem(block, new Item.Settings()
@@ -48,12 +50,12 @@ public class ModItems {
     }
 
     public static Item register(RegistryKey<Item> key, Function<Item.Settings, Item> factory, Item.Settings settings) {
-        Item item = (Item)factory.apply(settings.registryKey(key));
+        Item item = factory.apply(settings.registryKey(key));
         if (item instanceof BlockItem blockItem) {
             blockItem.appendBlocks(Item.BLOCK_ITEMS, item);
         }
 
-        return (Item)Registry.register(Registries.ITEM, key, item);
+        return Registry.register(Registries.ITEM, key, item);
     }
 /**/
 

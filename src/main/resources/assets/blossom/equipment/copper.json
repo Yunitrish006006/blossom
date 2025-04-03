@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "blossom:copper"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "blossom:copper"
+      }
+    ]
+  }
+}
