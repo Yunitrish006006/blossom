@@ -36,7 +36,7 @@ public class ModBlocks {
             ));
 
 
-    public static final Block gravel_iron_ore = registerBlock("gravel_iron_ore",
+    public static final Block GRAVEL_IRON_ORE = registerBlock("gravel_iron_ore",
             new ExperienceDroppingBlock(
                     UniformIntProvider.create(0, 2),
                     AbstractBlock.Settings.create()
@@ -47,14 +47,7 @@ public class ModBlocks {
             ));
 
     private static Block registerBlock(String name, Block block) {
-        registerBlockItem(name, block);
         return Registry.register(Registries.BLOCK, Blossom.identifier(name), block);
-    }
-
-    private static void registerBlockItem(String name, Block block) {
-        Registry.register(Registries.ITEM, Blossom.identifier(name), new BlockItem(block, new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, Blossom.identifier(name)))
-                .useBlockPrefixedTranslationKey()));
     }
 
     public static void registerModBlocks() {
@@ -63,7 +56,7 @@ public class ModBlocks {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries ->  {
             entries.add(ModBlocks.FISHNET);
             entries.add(ModBlocks.TRASH_CAN);
-            entries.add(ModBlocks.gravel_iron_ore);
+            entries.add(ModBlocks.GRAVEL_IRON_ORE);
         });
     }
 }

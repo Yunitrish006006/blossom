@@ -23,6 +23,10 @@ public class ModItemGroups {
                         entries.add(ModItems.COOKED_PUFFERFISH);
                         entries.add(ModBlocks.FISHNET);
                         entries.add(ModBlocks.TRASH_CAN);
+                        entries.add(ModItems.COPPER_HELMET);
+                        entries.add(ModItems.COPPER_CHESTPLATE);
+                        entries.add(ModItems.COPPER_LEGGINGS);
+                        entries.add(ModItems.COPPER_BOOTS);
                     }))
                     .build());
 

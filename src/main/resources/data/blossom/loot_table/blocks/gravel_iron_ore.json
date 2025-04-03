@@ -49,7 +49,7 @@
                   "function": "minecraft:explosion_decay"
                 }
               ],
-              "name": "blossom:raw_iron"
+              "name": "minecraft:raw_iron"
             }
           ]
         }
