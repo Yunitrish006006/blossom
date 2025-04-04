@@ -35,5 +35,6 @@
   "gui.blossom.teleport.accept": "Accept",
   "gui.blossom.teleport.reject": "Reject",
   "gui.blossom.teleport.request.message": "%s Requested to TP to your location",
-  "gui.blossom.teleport.rejected": "%s Rejected your TP Request"
+  "gui.blossom.teleport.rejected": "%s Rejected your TP Request",
+  "gui.blossom.teleport.players": "Player teleport"
 }

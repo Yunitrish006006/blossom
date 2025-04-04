@@ -8,6 +8,7 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
@@ -69,13 +70,19 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
                         UnitPayloadS2C.send("update", player, allUnits);
                     }
                     case "player_teleport" -> {
-                        //admin: from , allowed : to
                         PlayerManager playerManager = context.server().getPlayerManager();
-                        ServerPlayerEntity target = playerManager.getPlayer(payload.unit().admin().getFirst());
-                        ServerPlayerEntity request = playerManager.getPlayer(payload.unit().allowed().getFirst());
+                        ServerPlayerEntity target = playerManager.getPlayer(payload.unit().allowed().getFirst());
+                        ServerPlayerEntity request = playerManager.getPlayer(payload.unit().admin().getFirst());
                         if (target == null || request == null) return;
-                        SpaceUnit tempUnit = new SpaceUnit(target,request);
-                        tempUnit.teleport(request);
+
+
+                        System.out.println("player_teleport=====================");
+                        System.out.println("request:"+request.getUuid());
+                        System.out.println("target:"+target.getUuid());
+                        System.out.println("====================================");
+
+                        SpaceUnit tempUnit = new SpaceUnit(request,target);
+                        tempUnit.teleport(target);
                     }
                     case "temp_teleport" -> {
                         manager.addUnit(payload.unit());
@@ -87,6 +94,10 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
                         ServerPlayerEntity target = playerManager.getPlayer(payload.unit().admin().getFirst());
                         ServerPlayerEntity request = playerManager.getPlayer(payload.unit().allowed().getFirst());
                         if (target == null || request == null) return;
+                        System.out.println("request_teleport=====================");
+                        System.out.println("request:"+request.getUuid());
+                        System.out.println("target:"+target.getUuid());
+                        System.out.println("====================================");
                         UnitPayloadS2C.sendTpRequest(request, target);
                     }
                 }

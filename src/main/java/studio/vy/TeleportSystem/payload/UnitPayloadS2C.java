@@ -37,7 +37,7 @@ public record UnitPayloadS2C(String operation, List<SpaceUnit> units) implements
     }
 
     public static void sendTpRequest(ServerPlayerEntity requestPlayer, ServerPlayerEntity targetPlayer) {
-        ServerPlayNetworking.send(requestPlayer, new UnitPayloadS2C("request", new ArrayList<>(List.of(new SpaceUnit(requestPlayer, targetPlayer)))));
+        ServerPlayNetworking.send(requestPlayer, new UnitPayloadS2C("request", new ArrayList<>(List.of(new SpaceUnit(targetPlayer, requestPlayer)))));
     }
 
     @Override
@@ -54,6 +54,10 @@ public record UnitPayloadS2C(String operation, List<SpaceUnit> units) implements
                 switch (payload.operation()) {
                     case "request" -> {
                         SpaceUnit request = payload.units().getFirst();
+                        System.out.println("request=====================");
+                        System.out.println("request:"+request.admin().getFirst());
+                        System.out.println("target:"+request.allowed().getFirst());
+                        System.out.println("====================================");
                         context.client().setScreen(new TeleportConfirm(request.allowed().getFirst(), request.admin().getFirst()));
                     }
                     case "update" -> {

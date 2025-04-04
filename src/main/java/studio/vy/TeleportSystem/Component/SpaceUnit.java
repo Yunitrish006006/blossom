@@ -58,6 +58,7 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
     }
     public SpaceUnit(ServerPlayerEntity player, ServerPlayerEntity requestPlayer) {
         this("request", player.getX(), player.getY(), player.getZ(), player.getServerWorld().getRegistryKey().getValue().toString(), player.getUuid());
+        this.allowed.clear();
         this.allowed.add(requestPlayer.getUuid());
     }
 

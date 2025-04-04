@@ -35,5 +35,6 @@
   "gui.blossom.teleport.accept": "接受",
   "gui.blossom.teleport.reject": "拒絕",
   "gui.blossom.teleport.request.message": "%s 請求傳送到你的位置",
-  "gui.blossom.teleport.rejected": "%s 拒絕了你的傳送請求"
+  "gui.blossom.teleport.rejected": "%s 拒絕了你的傳送請求",
+  "gui.blossom.teleport.players": "玩家傳送"
 }

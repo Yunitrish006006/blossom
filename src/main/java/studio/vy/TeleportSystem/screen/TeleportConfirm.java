@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
@@ -47,6 +48,12 @@ public class TeleportConfirm extends Screen {
         tempUnit.admin().add(requester);
         tempUnit.allowed().clear();
         tempUnit.allowed().add(target);
+
+        System.out.println("accept==============================");
+        System.out.println("request:"+requester);
+        System.out.println("target:"+target);
+        System.out.println("====================================");
+
         UnitPayloadC2S.send("player_teleport", tempUnit);
     }
 
@@ -56,8 +63,14 @@ public class TeleportConfirm extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
+        String requestPlayerName = "";
+        for (PlayerListEntry request : client.getNetworkHandler().getPlayerList()) {
+            if (request.getProfile().getId().equals(requester)) {
+                requestPlayerName = request.getProfile().getName();
+            }
+        }
         context.drawCenteredTextWithShadow(textRenderer,
-                Text.translatable("gui.blossom.teleport.request.message", requester).getString(),
+                Text.translatable("gui.blossom.teleport.request.message", requestPlayerName).getString(),
                 width/2, height/2 - 30, 0xFFFFFF);
         super.render(context, mouseX, mouseY, delta);
     }

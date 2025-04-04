@@ -203,15 +203,14 @@ public class UnitList extends Screen {
         int y = 70;
         int grid_x = 4;
         if (client != null && client.getNetworkHandler() != null) {
-            for (PlayerListEntry player : client.getNetworkHandler().getPlayerList()) {
-                // Skip self
-                if (client.player != null && player.getProfile().getId().equals(client.player.getUuid())) {
+            for (PlayerListEntry targetPlayer : client.getNetworkHandler().getPlayerList()) {
+                if (client.player != null && targetPlayer.getProfile().getId().equals(client.player.getUuid())) {
                     continue;
                 }
 
                 this.addDrawableChild(ButtonWidget.builder(
-                        Text.literal(player.getProfile().getName()),
-                        button -> requestTeleportToPlayer(player.getProfile().getId())
+                        Text.literal(targetPlayer.getProfile().getName()),
+                        button -> requestTeleportToPlayer(targetPlayer.getProfile().getId())
                 ).dimensions(
                         this.width * grid_x / 16 - BUTTON_WIDTH / 2,
                         y,
@@ -229,7 +228,6 @@ public class UnitList extends Screen {
     }
 
     private void requestTeleportToPlayer(UUID targetId) {
-
         if (client == null || client.player == null) return;
         SpaceUnit temp = SpaceUnit.ERROR;
         temp.admin().clear();
