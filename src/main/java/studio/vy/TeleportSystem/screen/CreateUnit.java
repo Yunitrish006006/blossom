@@ -32,7 +32,7 @@ public class CreateUnit extends Screen {
                 50,
                 FIELD_WIDTH,
                 FIELD_HEIGHT,
-                Text.translatable("Name")
+                Text.translatable("gui.blossom.teleport.name")
         );
         nameField.setMaxLength(32);
         this.addDrawableChild(nameField);
@@ -68,9 +68,10 @@ public class CreateUnit extends Screen {
             SpaceUnit unit = new SpaceUnit(name, x, y, z, dimension, client.player.getUuid());
 
             if (client.isInSingleplayer()) {
-                SpaceUnitManager.getClientInstance(client.getServer()).addUnit(unit);
+                SpaceUnitManager.getClientInstance().addUnit(unit);
             } else {
                 UnitPayloadC2S.send("add", unit);
+                UnitPayloadC2S.send("fetch_owned", null);
             }
             client.setScreen(parent);
         }

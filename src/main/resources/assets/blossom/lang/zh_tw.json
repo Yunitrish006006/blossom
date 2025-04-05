@@ -18,6 +18,7 @@
   "key.blossom.flight": "切換飛行模式",
 
   "gui.blossom.teleport.title": "傳送介面",
+  "gui.blossom.teleport.name": "名稱",
   "gui.blossom.teleport.teleport": "傳送",
   "gui.blossom.teleport.cancel": "取消",
   "gui.blossom.teleport.create": "建立傳送節點",

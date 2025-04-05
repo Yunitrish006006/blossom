@@ -18,6 +18,7 @@
   "key.blossom.flight": "toggle flight",
 
   "gui.blossom.teleport.title": "Teleport",
+  "gui.blossom.teleport.name": "Name",
   "gui.blossom.teleport.teleport": "Teleport",
   "gui.blossom.teleport.cancel": "Cancel",
   "gui.blossom.teleport.add_player": "Add Player",
@@ -36,5 +37,6 @@
   "gui.blossom.teleport.reject": "Reject",
   "gui.blossom.teleport.request.message": "%s Requested to TP to your location",
   "gui.blossom.teleport.rejected": "%s Rejected your TP Request",
-  "gui.blossom.teleport.players": "Player teleport"
+  "gui.blossom.teleport.players": "Player teleport",
+  "gui.blossom.teleport.search_player": "Search player"
 }

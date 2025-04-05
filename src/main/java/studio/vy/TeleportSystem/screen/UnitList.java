@@ -174,7 +174,7 @@ public class UnitList extends Screen {
         if (!client.isInSingleplayer()) {
             UnitPayloadC2S.send("fetch_all", null);
         } else if (client.player != null) {
-            SpaceUnitManager manager = SpaceUnitManager.getClientInstance(client.getServer());
+            SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
             units = manager.config.units;
         }
     }
@@ -184,7 +184,7 @@ public class UnitList extends Screen {
         if (!client.isInSingleplayer()) {
             UnitPayloadC2S.send("fetch_allowed", null);
         } else if (client.player != null) {
-            SpaceUnitManager manager = SpaceUnitManager.getClientInstance(client.getServer());
+            SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
             units = manager.config.getAllowed(client.player.getUuid());
         }
     }
@@ -194,7 +194,7 @@ public class UnitList extends Screen {
         if (!client.isInSingleplayer()) {
             UnitPayloadC2S.send("fetch_owned", null);
         } else if (client.player != null) {
-            SpaceUnitManager manager = SpaceUnitManager.getClientInstance(client.getServer());
+            SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
             units = manager.config.getOwned(client.player.getUuid());
         }
     }
@@ -272,7 +272,7 @@ public class UnitList extends Screen {
         assert client != null;
         if (client.player != null && unit.owner().equals(client.player.getUuid())) {
             if (client.isInSingleplayer()) {
-                SpaceUnitManager.getClientInstance(client.getServer()).removeUnit(unit);
+                SpaceUnitManager.getClientInstance().removeUnit(unit);
                 units.remove(unit);
                 init();
             } else {

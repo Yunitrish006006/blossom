@@ -6,6 +6,7 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import studio.vy.block.ModBlocks;
+import studio.vy.event.PlayerDeathListener;
 import studio.vy.item.ModItemGroups;
 import studio.vy.item.ModItems;
 
@@ -18,9 +19,10 @@ public class Blossom implements ModInitializer {
 	}
 	@Override
 	public void onInitialize() {
+		LOGGER.info("initializing mod");
 		ModPayload.initCommon();
 		ModPayload.initServer();
-		LOGGER.info("initializing mod");
+		PlayerDeathListener.register();
 		ModItems.registerModItems();
 		ModBlocks.registerModBlocks();
 		ModItemGroups.registerModItemGroups();

@@ -101,7 +101,7 @@ public class EditUnit extends Screen {
                 Text.literal(player.getNameForScoreboard()),
                 button -> {
                     if (MinecraftClient.getInstance().isInSingleplayer()) {
-                        SpaceUnitManager.getClientInstance(MinecraftClient.getInstance().getServer())
+                        SpaceUnitManager.getClientInstance()
                                 .addAllowedPlayer(unit, player.getUuid());
                     } else {
                         UnitPayloadC2S.send("add_allowed", unit);

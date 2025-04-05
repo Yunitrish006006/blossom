@@ -8,12 +8,10 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
 import java.util.List;
-import java.util.UUID;
 
 public record UnitPayloadC2S(String operation, SpaceUnit unit) implements CustomPayload {
     public static final Id<UnitPayloadC2S> ID = CustomPayload.id("server_space_unit");
@@ -39,12 +37,14 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
         public void receive(UnitPayloadC2S payload, ServerPlayNetworking.Context context) {
             ServerPlayerEntity player = context.player();
             if (player != null) {
-                SpaceUnitManager manager = SpaceUnitManager.getServerInstance(player.getServer());
+                SpaceUnitManager manager = SpaceUnitManager.getServerInstance();
 
                 switch (payload.operation()) {
                     case "add" -> {
                         if (payload.unit().owner().equals(player.getUuid())) {
                             manager.addUnit(payload.unit());
+                            List<SpaceUnit> ownedUnits = manager.config.getOwned(player.getUuid());
+                            UnitPayloadS2C.send("update", player, ownedUnits);
                         }
                     }
                     case "remove" -> {

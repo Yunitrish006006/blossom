@@ -1,7 +1,6 @@
 package studio.vy.TeleportSystem.Component;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
@@ -12,7 +11,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import org.apache.logging.log4j.core.jmx.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +47,10 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         List<UUID> admin = packetByteBuf.readCollection(ArrayList::new, buffer -> buffer.readUuid());
         List<UUID> allowed = packetByteBuf.readCollection(ArrayList::new, buffer -> buffer.readUuid());
         return new SpaceUnit(name, x, y, z, dimension, owner, admin, allowed);
+    }
+
+    public SpaceUnit(String name, ServerPlayerEntity player) {
+        this(name, player.getX(), player.getY(), player.getZ(), player.getServerWorld().getRegistryKey().getValue().toString(), player.getUuid());
     }
 
     public SpaceUnit(String name, double x, double y, double z, String dimension, UUID owner) {

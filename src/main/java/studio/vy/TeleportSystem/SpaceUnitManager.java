@@ -2,7 +2,6 @@ package studio.vy.TeleportSystem;
 
 import com.google.gson.Gson;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.MinecraftServer;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 
 import java.io.File;
@@ -19,7 +18,7 @@ public class SpaceUnitManager {
     private final File file;
     public SpaceUnitConfig config;
 
-    private SpaceUnitManager(MinecraftServer server, boolean isClient) {
+    private SpaceUnitManager(boolean isClient) {
         if (isClient) {
             this.file = new File(FabricLoader.getInstance().getGameDir() + "/Blossom/Units.json");
         } else {
@@ -34,26 +33,20 @@ public class SpaceUnitManager {
                 file.createNewFile();
                 config = new SpaceUnitConfig();
                 write();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            } catch (IOException ignored) {}
         }
     }
 
-    public List<SpaceUnit> getAllUnits() {
-        return new ArrayList<>(config.units);
-    }
-
-    public static SpaceUnitManager getServerInstance(MinecraftServer server) {
+    public static SpaceUnitManager getServerInstance() {
         if (serverInstance == null) {
-            serverInstance = new SpaceUnitManager(server, false);
+            serverInstance = new SpaceUnitManager(false);
         }
         return serverInstance;
     }
 
-    public static SpaceUnitManager getClientInstance(MinecraftServer server) {
+    public static SpaceUnitManager getClientInstance() {
         if (clientInstance == null) {
-            clientInstance = new SpaceUnitManager(server, true);
+            clientInstance = new SpaceUnitManager(true);
         }
         return clientInstance;
     }
