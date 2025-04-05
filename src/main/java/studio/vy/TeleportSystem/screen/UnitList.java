@@ -7,7 +7,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import studio.vy.Blossom;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
@@ -21,7 +20,6 @@ public class UnitList extends Screen {
     private static final int BUTTON_HEIGHT = 20;
     private List<SpaceUnit> units = new ArrayList<>();
     public static String page = "owned";
-    private static int ITEMS_PER_PAGE = 8;
     private int scrollOffset = 0;
     private int maxScroll = 0;
 
@@ -141,7 +139,7 @@ public class UnitList extends Screen {
         // 計算可用空間和最大顯示數量
         int availableHeight = this.height - y - 30; // 預留底部空間
         int maxVisibleItems = availableHeight / (BUTTON_HEIGHT + 5);
-        ITEMS_PER_PAGE = Math.min(8, maxVisibleItems); // 動態調整每頁顯示數量
+        int ITEMS_PER_PAGE = Math.min(8, maxVisibleItems); // 動態調整每頁顯示數量
 
         // 計算最大滾動值
         maxScroll = Math.max(0, units.size() - ITEMS_PER_PAGE);
@@ -211,9 +209,8 @@ public class UnitList extends Screen {
         if (!client.isInSingleplayer()) {
             switch (page) {
                 case "owned" -> UnitPayloadC2S.send("fetch_owned", null);
-                case "admin" -> {}
+                case "admin", "players" -> {}
                 case "allowed" -> UnitPayloadC2S.send("fetch_allowed", null);
-                case "players" -> {}
                 case "all" -> UnitPayloadC2S.send("fetch_all", null);
             }
         }
@@ -222,13 +219,11 @@ public class UnitList extends Screen {
             SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
             switch (page) {
                 case "owned" -> units = manager.config.getOwned(playerId);
-                case "admin" -> {}
+                case "admin", "players" -> {}
                 case "allowed" -> units = manager.config.getAllowed(playerId);
-                case "players" -> {}
                 case "all" -> units = manager.config.units;
             }
         }
-        Blossom.LOGGER.info("fetch units: " + page + " " + units.size());
     }
     /*---------------------------------------player---------------------------------------*/
     private void renderPlayerPage() {

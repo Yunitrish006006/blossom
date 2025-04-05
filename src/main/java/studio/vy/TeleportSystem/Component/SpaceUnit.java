@@ -49,8 +49,17 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         return new SpaceUnit(name, x, y, z, dimension, owner, admin, allowed);
     }
 
+    public SpaceUnit(SpaceUnit other) {
+        this(other.name, other.x, other.y, other.z, other.dimension, other.owner,
+                new ArrayList<>(other.admin), new ArrayList<>(other.allowed));
+    }
+
     public SpaceUnit(String name, ServerPlayerEntity player) {
-        this(name, player.getX(), player.getY(), player.getZ(), player.getServerWorld().getRegistryKey().getValue().toString(), player.getUuid());
+        this(name, player.getX(), player.getY(), player.getZ(),
+                player.getServerWorld().getRegistryKey().getValue().toString(),
+                player.getUuid(),
+                new ArrayList<>(List.of(player.getUuid())),
+                new ArrayList<>(List.of(player.getUuid())));
     }
 
     public SpaceUnit(String name, double x, double y, double z, String dimension, UUID owner) {
@@ -58,10 +67,13 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
                 new ArrayList<>(List.of(owner)),
                 new ArrayList<>(List.of(owner)));
     }
+
     public SpaceUnit(ServerPlayerEntity player, ServerPlayerEntity requestPlayer) {
-        this("request", player.getX(), player.getY(), player.getZ(), player.getServerWorld().getRegistryKey().getValue().toString(), player.getUuid());
-        this.allowed.clear();
-        this.allowed.add(requestPlayer.getUuid());
+        this("request", player.getX(), player.getY(), player.getZ(),
+                player.getServerWorld().getRegistryKey().getValue().toString(),
+                player.getUuid(),
+                new ArrayList<>(List.of(player.getUuid())),
+                new ArrayList<>(List.of(requestPlayer.getUuid())));
     }
 
     public SpaceUnit(String name, Vec3d position, String dimension, UUID owner) {

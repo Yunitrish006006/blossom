@@ -6,9 +6,9 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
+import studio.vy.TeleportSystem.screen.EditUnit;
 import studio.vy.TeleportSystem.screen.TeleportConfirm;
 import studio.vy.TeleportSystem.screen.UnitList;
 
@@ -54,16 +54,13 @@ public record UnitPayloadS2C(String operation, List<SpaceUnit> units) implements
                 switch (payload.operation()) {
                     case "request" -> {
                         SpaceUnit request = payload.units().getFirst();
-                        System.out.println("request=====================");
-                        System.out.println("request:"+request.admin().getFirst());
-                        System.out.println("target:"+request.allowed().getFirst());
-                        System.out.println("====================================");
                         context.client().setScreen(new TeleportConfirm(request.allowed().getFirst(), request.admin().getFirst()));
                     }
                     case "update" -> {
-                        UnitList screen = (UnitList) context.client().currentScreen;
-                        if (screen != null) {
+                        if (context.client().currentScreen instanceof UnitList screen) {
                             screen.refresh(payload.units());
+                        } else if (context.client().currentScreen instanceof EditUnit screen) {
+                            context.client().setScreen(new UnitList());
                         }
                     }
                 }

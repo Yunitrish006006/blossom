@@ -5,7 +5,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
@@ -19,8 +18,7 @@ import java.util.UUID;
 public class EditUnit extends Screen {
     private final Screen parent;
     private final SpaceUnit unit;
-    private final List<ServerPlayerEntity> onlinePlayers = new ArrayList<>();
-    private int scrollOffset = 0;
+    private final List<UUID> onlinePlayers = new ArrayList<>();
     private static final int BUTTON_WIDTH = 200;
     private static final int BUTTON_HEIGHT = 20;
     private static final int PLAYER_BUTTON_HEIGHT = 32;
@@ -32,6 +30,23 @@ public class EditUnit extends Screen {
         this.parent = parent;
         this.unit = unit;
         updateOnlinePlayers();
+    }
+
+    private void updateOnlinePlayers() {
+        onlinePlayers.clear();
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.getNetworkHandler() != null) {
+            for (PlayerListEntry entry : client.getNetworkHandler().getPlayerList()) {
+                UUID playerId = entry.getProfile().getId();
+                // 排除自己和已有權限的玩家
+                if (!playerId.equals(client.player.getUuid())
+                        && !unit.allowed().contains(playerId)
+                        && !unit.admin().contains(playerId)
+                        && !unit.owner().equals(playerId)) {
+                    onlinePlayers.add(playerId);
+                }
+            }
+        }
     }
 
     @Override
@@ -75,33 +90,40 @@ public class EditUnit extends Screen {
                 }
         ).dimensions(this.width / 2 - BUTTON_WIDTH / 2 + tabWidth * 3, 10, tabWidth, BUTTON_HEIGHT).build());
 
-        // 顯示玩家列表
         int startY = 80;
-        List<UUID> displayList = switch (currentTab) {
-            case "admin" -> unit.admin();
-            case "allowed" -> unit.allowed();
-            case "owner" -> Collections.singletonList(unit.owner());
-            default -> onlinePlayers.stream().map(ServerPlayerEntity::getUuid).toList();
-        };
+        List<UUID> displayList;
+        switch (currentTab) {
+            case "admin" -> displayList = new ArrayList<>(unit.admin());
+            case "allowed" -> displayList = new ArrayList<>(unit.allowed());
+            case "owner" -> displayList = Collections.singletonList(unit.owner());
+            default -> displayList = onlinePlayers;
+        }
 
+        int scrollOffset = 0;
         for (int i = 0; i < Math.min(PLAYERS_PER_PAGE, displayList.size() - scrollOffset); i++) {
             UUID playerId = displayList.get(scrollOffset + i);
-            String playerName = getPlayerName(playerId);
+            final String playerName = getPlayerName(playerId);
 
-            // 新增玩家按鈕
             this.addDrawableChild(ButtonWidget.builder(
                     Text.literal(playerName),
                     button -> handlePlayerClick(playerId)
-            ).dimensions(this.width / 2 - BUTTON_WIDTH / 2, startY + (i * (PLAYER_BUTTON_HEIGHT + 5)),
-                    BUTTON_WIDTH - 30, PLAYER_BUTTON_HEIGHT).build());
+            ).dimensions(
+                    this.width / 2 - BUTTON_WIDTH / 2,
+                    startY + (i * (PLAYER_BUTTON_HEIGHT + 5)),
+                    BUTTON_WIDTH - 30,
+                    PLAYER_BUTTON_HEIGHT
+            ).build());
 
-            // 如果不是 owner 頁面，添加刪除按鈕
             if (!currentTab.equals("owner")) {
                 this.addDrawableChild(ButtonWidget.builder(
                         Text.literal("×"),
                         button -> removePlayer(playerId)
-                ).dimensions(this.width / 2 + BUTTON_WIDTH / 2 - 25,
-                        startY + (i * (PLAYER_BUTTON_HEIGHT + 5)), 20, PLAYER_BUTTON_HEIGHT).build());
+                ).dimensions(
+                        this.width / 2 + BUTTON_WIDTH / 2 - 25,
+                        startY + (i * (PLAYER_BUTTON_HEIGHT + 5)),
+                        20,
+                        PLAYER_BUTTON_HEIGHT
+                ).build());
             }
         }
 
@@ -126,15 +148,27 @@ public class EditUnit extends Screen {
 
     private void handlePlayerClick(UUID playerId) {
         if (currentTab.equals("all")) {
-            // 添加到 allowed 列表
-            unit.allowed().add(playerId);
             if (MinecraftClient.getInstance().isInSingleplayer()) {
+                unit.allowed().add(playerId);
                 SpaceUnitManager.getClientInstance().addAllowedPlayer(unit, playerId);
+                MinecraftClient.getInstance().setScreen(parent);
             } else {
-                UnitPayloadC2S.send("add_allowed", unit);  // 確保伺服器端有對應的處理邏輯
+                // 建立一個臨時的 SpaceUnit，只保留必要資訊
+                SpaceUnit tempUnit = new SpaceUnit(
+                        unit.name(),
+                        unit.x(),
+                        unit.y(),
+                        unit.z(),
+                        unit.dimension(),
+                        unit.owner()
+                );
+                // 清空預設的權限列表
+                tempUnit.allowed().clear();
+                // 只添加目標玩家
+                tempUnit.allowed().add(playerId);
+                UnitPayloadC2S.send("add_allowed", tempUnit);
+                MinecraftClient.getInstance().setScreen(parent);
             }
-            updateOnlinePlayers();  // 更新完後重新整理列表
-            clearAndInit();
         }
     }
 
@@ -147,31 +181,6 @@ public class EditUnit extends Screen {
             UnitPayloadC2S.send("update_permissions", unit);
         }
         updateOnlinePlayers();
-        clearAndInit();
-    }
-
-    private void updateOnlinePlayers() {
-        onlinePlayers.clear();
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.getNetworkHandler() != null) {
-            client.getNetworkHandler().getPlayerList().forEach(entry -> {
-                ServerPlayerEntity player = client.getServer() != null ?
-                        client.getServer().getPlayerManager().getPlayer(entry.getProfile().getId()) : null;
-                if (player != null && !unit.allowed().contains(player.getUuid())
-                        && !unit.admin().contains(player.getUuid())) {
-                    onlinePlayers.add(player);
-                }
-            });
-        }
-    }
-
-    private void filterPlayers(String search) {
-        if (!search.isEmpty()) {
-            onlinePlayers.removeIf(player ->
-                    !player.getNameForScoreboard().toLowerCase().contains(search.toLowerCase())
-            );
-        }
-        scrollOffset = 0;
         clearAndInit();
     }
 

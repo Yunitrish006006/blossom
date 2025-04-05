@@ -8,10 +8,12 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
 import java.util.List;
+import java.util.UUID;
 
 public record UnitPayloadC2S(String operation, SpaceUnit unit) implements CustomPayload {
     public static final Id<UnitPayloadC2S> ID = CustomPayload.id("server_space_unit");
@@ -91,9 +93,29 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
                     }
                     case "add_allowed" -> {
                         if (payload.unit() != null) {
-                            manager.addAllowedPlayer(payload.unit(), player.getUuid());
-                            List<SpaceUnit> ownedUnits = manager.config.getOwned(player.getUuid());
-                            UnitPayloadS2C.send("update", player, ownedUnits);
+                            // 確保當前玩家是該單位的擁有者
+                            SpaceUnit targetUnit = manager.config.getOwned(player.getUuid()).stream()
+                                    .filter(u -> u.name().equals(payload.unit().name()))
+                                    .findFirst()
+                                    .orElse(null);
+
+                            if (targetUnit != null) {
+                                // 從 payload.unit 中獲取要添加的玩家 UUID
+                                UUID targetPlayerId = payload.unit().allowed().getFirst();
+
+                                // 在伺服器端更新權限
+                                manager.addAllowedPlayer(targetUnit, targetPlayerId);
+
+                                // 通知目標玩家已被添加權限
+                                ServerPlayerEntity targetPlayer = context.server().getPlayerManager().getPlayer(targetPlayerId);
+                                if (targetPlayer != null) {
+                                    targetPlayer.sendMessage(Text.of("You have been added to unit: " + targetUnit.name()), true);
+                                }
+
+                                // 發送更新後的單位列表給擁有者
+                                List<SpaceUnit> ownedUnits = manager.config.getOwned(player.getUuid());
+                                UnitPayloadS2C.send("update", player, ownedUnits);
+                            }
                         }
                     }
                 }
