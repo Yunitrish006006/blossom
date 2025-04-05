@@ -7,22 +7,27 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import studio.vy.Blossom;
 import studio.vy.TeleportSystem.payload.UnitPayloadC2S;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class UnitList extends Screen {
     private static final int BUTTON_WIDTH = 200;
     private static final int BUTTON_HEIGHT = 20;
-    private List<SpaceUnit> units;
+    private List<SpaceUnit> units = new ArrayList<>();
     public static String page = "owned";
+    private static int ITEMS_PER_PAGE = 8;
+    private int scrollOffset = 0;
+    private int maxScroll = 0;
 
-    public UnitList(List<SpaceUnit> units) {
+    public UnitList() {
         super(Text.translatable("gui.blossom.teleport.title"));
-        this.units = units;
+        fetchUnits(page);
     }
 
     private void editPermission(SpaceUnit unit) {
@@ -83,57 +88,99 @@ public class UnitList extends Screen {
                 .build();
     }
 
+    private void addButton(int x, int y, int width, int height, Text text, ButtonWidget.PressAction action) {
+        this.addDrawableChild(ButtonWidget.builder(text, action).dimensions(x, y, width, height).build());
+    }
+
     private void renderPageButtonRow() {
         int x = this.width / 16;
         int y = 20;
         int buttonWidth = BUTTON_WIDTH/4;
-        this.addDrawableChild(ButtonWidget.builder(
-                        Text.translatable("gui.blossom.teleport.owned_units"),
-                        button -> {
-                            page = "owned";
-                            fetchOwnedUnits();
-                            clearAndInit();
-                        }
-                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
-                .build());
+        List<ButtonWidget.PressAction> actions = List.of(
+                button -> {
+                    page = "owned";
+                    fetchUnits(page);
+                    clearAndInit();
+                },
+                button -> {
+                    page = "allowed";
+                    fetchUnits(page);
+                    clearAndInit();
+                },
+                button -> {
+                    page = "players";
+                    fetchUnits(page);
+                    clearAndInit();
+                },
+                button -> {
+                    page = "all";
+                    fetchUnits(page);
+                    clearAndInit();
+                }
+        );
+        List<Text> texts = List.of(
+                Text.translatable("gui.blossom.teleport.owned_units"),
+                Text.translatable("gui.blossom.teleport.allowed_units"),
+                Text.translatable("gui.blossom.teleport.players"),
+                Text.translatable("gui.blossom.teleport.all_units")
+        );
 
-        x+=this.width/16+buttonWidth;
-
-        this.addDrawableChild(ButtonWidget.builder(
-                        Text.translatable("gui.blossom.teleport.all_units"),
-                        button -> {
-                            page = "all";
-                            fetchAllUnits();
-                            clearAndInit();
-                        }
-                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
-                .build());
-        x+=this.width/16+buttonWidth;
-        this.addDrawableChild(ButtonWidget.builder(
-                        Text.translatable("gui.blossom.teleport.allowed_units"),
-                        button -> {
-                            page = "allowed";
-                            fetchAllowedUnits();
-                            clearAndInit();
-                        }
-                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
-                .build());
-        x+=this.width/16+buttonWidth;
-        this.addDrawableChild(ButtonWidget.builder(
-                        Text.translatable("gui.blossom.teleport.players"),
-                        button -> {
-                            page = "players";
-                            clearAndInit();
-                        }
-                ).dimensions(x, y, buttonWidth, BUTTON_HEIGHT)
-                .build());
+        for (Text text : texts) {
+            addButton(x, y, buttonWidth, BUTTON_HEIGHT, text, actions.get(texts.indexOf(text)));
+            x += this.width / 16 + buttonWidth;
+        }
     }
 
-    private void renderEditAbleTypePage(boolean canEdit) {
+    private void renderGeneralPage(boolean canEdit) {
         int y = 50;
-        this.addDrawableChild(createNewUnitButton(y));
-        y += BUTTON_HEIGHT + 5;
-        for (SpaceUnit unit : units) {
+        if (canEdit) {
+            this.addDrawableChild(createNewUnitButton(y));
+            y += BUTTON_HEIGHT + 5;
+        }
+
+        // 計算可用空間和最大顯示數量
+        int availableHeight = this.height - y - 30; // 預留底部空間
+        int maxVisibleItems = availableHeight / (BUTTON_HEIGHT + 5);
+        ITEMS_PER_PAGE = Math.min(8, maxVisibleItems); // 動態調整每頁顯示數量
+
+        // 計算最大滾動值
+        maxScroll = Math.max(0, units.size() - ITEMS_PER_PAGE);
+        scrollOffset = Math.min(scrollOffset, maxScroll); // 確保不會過度滾動
+
+        // 計算滾動按鈕位置
+        int contentHeight = ITEMS_PER_PAGE * (BUTTON_HEIGHT + 5);
+        int topButtonY = y;
+        int bottomButtonY = Math.min(y + contentHeight, height - 30);
+
+        // 只有當有需要滾動時才顯示滾動按鈕
+        if (units.size() > ITEMS_PER_PAGE) {
+            // 上方滾動按鈕
+            this.addDrawableChild(ButtonWidget.builder(
+                    Text.literal("▲"),
+                    button -> {
+                        scrollOffset = Math.max(0, scrollOffset - 1);
+                        clearAndInit();
+                    }
+            ).dimensions(this.width / 2 + BUTTON_WIDTH / 2 + 5, topButtonY, 20, 20).build());
+
+            // 下方滾動按鈕
+            this.addDrawableChild(ButtonWidget.builder(
+                    Text.literal("▼"),
+                    button -> {
+                        scrollOffset = Math.min(maxScroll, scrollOffset + 1);
+                        clearAndInit();
+                    }
+            ).dimensions(this.width / 2 + BUTTON_WIDTH / 2 + 5, bottomButtonY, 20, 20).build());
+        }
+
+        // 渲染可見的傳送點
+        int startIndex = scrollOffset;
+        int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, units.size());
+
+        for (int i = startIndex; i < endIndex; i++) {
+            if (y + BUTTON_HEIGHT > this.height - 30) break; // 確保不會超出底部
+
+            SpaceUnit unit = units.get(i);
             this.addDrawableChild(teleportUnitButton(unit, y));
             if (canEdit) {
                 this.addDrawableChild(editUnitButton(unit, y));
@@ -143,62 +190,47 @@ public class UnitList extends Screen {
         }
     }
 
-    private void renderAllowedUnitPage() {
-        int y = 70;
-        int grid_x = 4;
-        for (SpaceUnit unit : units) {
-            this.addDrawableChild(teleportUnitButton(unit, grid_x, y));
-            y += BUTTON_HEIGHT + 5;
-            if (y > this.height - 50) {
-                y = 70;
-                grid_x += 3;
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (verticalAmount > 0 && scrollOffset > 0) {
+            scrollOffset--;
+            clearAndInit();
+            return true;
+        } else if (verticalAmount < 0 && scrollOffset < maxScroll) {
+            scrollOffset++;
+            clearAndInit();
+            return true;
+        }
+        return false;
+    }
+
+
+    private void fetchUnits(String page) {
+        if (client==null) return;
+        units.clear();
+        if (!client.isInSingleplayer()) {
+            switch (page) {
+                case "owned" -> UnitPayloadC2S.send("fetch_owned", null);
+                case "admin" -> {}
+                case "allowed" -> UnitPayloadC2S.send("fetch_allowed", null);
+                case "players" -> {}
+                case "all" -> UnitPayloadC2S.send("fetch_all", null);
             }
         }
-    }
-
-    private void renderAllUnitPage() {
-        int y = 70;
-        int grid_x = 4;
-        for (SpaceUnit unit : units) {
-            this.addDrawableChild(teleportUnitButton(unit, grid_x, y));
-            y += BUTTON_HEIGHT + 5;
-            if (y > this.height - 50) {
-                y = 70;
-                grid_x += 3;
+        else {
+            UUID playerId = client.player.getUuid();
+            SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
+            switch (page) {
+                case "owned" -> units = manager.config.getOwned(playerId);
+                case "admin" -> {}
+                case "allowed" -> units = manager.config.getAllowed(playerId);
+                case "players" -> {}
+                case "all" -> units = manager.config.units;
             }
         }
+        Blossom.LOGGER.info("fetch units: " + page + " " + units.size());
     }
-
-    private void fetchAllUnits() {
-        if (client==null) return;
-        if (!client.isInSingleplayer()) {
-            UnitPayloadC2S.send("fetch_all", null);
-        } else if (client.player != null) {
-            SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
-            units = manager.config.units;
-        }
-    }
-
-    private void fetchAllowedUnits() {
-        if (client==null) return;
-        if (!client.isInSingleplayer()) {
-            UnitPayloadC2S.send("fetch_allowed", null);
-        } else if (client.player != null) {
-            SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
-            units = manager.config.getAllowed(client.player.getUuid());
-        }
-    }
-
-    private void fetchOwnedUnits() {
-        if (client==null) return;
-        if (!client.isInSingleplayer()) {
-            UnitPayloadC2S.send("fetch_owned", null);
-        } else if (client.player != null) {
-            SpaceUnitManager manager = SpaceUnitManager.getClientInstance();
-            units = manager.config.getOwned(client.player.getUuid());
-        }
-    }
-
+    /*---------------------------------------player---------------------------------------*/
     private void renderPlayerPage() {
         int y = 70;
         int grid_x = 4;
@@ -238,7 +270,6 @@ public class UnitList extends Screen {
         client.setScreen(null);
     }
 
-
     public void refresh(List<SpaceUnit> newUnits) {
         if (!this.units.equals(newUnits)) {
             this.units = newUnits;
@@ -249,22 +280,12 @@ public class UnitList extends Screen {
     @Override
     protected void init() {
         super.init();
-        if (units.isEmpty()) {
-            switch (page) {
-                case "owned" -> fetchOwnedUnits();
-                case "admin" -> {}
-                case "allowed" -> fetchAllowedUnits();
-                case "players" -> units = List.of();
-                case "all" -> fetchAllUnits();
-            }
-        }
         renderPageButtonRow();
         switch (page) {
-            case "owned" -> renderEditAbleTypePage(true);
+            case "owned" -> renderGeneralPage(true);
             case "admin" -> {}
-            case "allowed" -> renderAllowedUnitPage();
+            case "allowed", "all" -> renderGeneralPage(false);
             case "players" -> renderPlayerPage();
-            case "all" -> renderAllUnitPage();
         }
     }
 

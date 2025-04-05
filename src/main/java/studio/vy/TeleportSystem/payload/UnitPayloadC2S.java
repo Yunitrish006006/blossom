@@ -74,13 +74,6 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
                         ServerPlayerEntity target = playerManager.getPlayer(payload.unit().allowed().getFirst());
                         ServerPlayerEntity request = playerManager.getPlayer(payload.unit().admin().getFirst());
                         if (target == null || request == null) return;
-
-
-                        System.out.println("player_teleport=====================");
-                        System.out.println("request:"+request.getUuid());
-                        System.out.println("target:"+target.getUuid());
-                        System.out.println("====================================");
-
                         SpaceUnit tempUnit = new SpaceUnit(request,target);
                         tempUnit.teleport(target);
                     }
@@ -94,11 +87,14 @@ public record UnitPayloadC2S(String operation, SpaceUnit unit) implements Custom
                         ServerPlayerEntity target = playerManager.getPlayer(payload.unit().admin().getFirst());
                         ServerPlayerEntity request = playerManager.getPlayer(payload.unit().allowed().getFirst());
                         if (target == null || request == null) return;
-                        System.out.println("request_teleport=====================");
-                        System.out.println("request:"+request.getUuid());
-                        System.out.println("target:"+target.getUuid());
-                        System.out.println("====================================");
                         UnitPayloadS2C.sendTpRequest(request, target);
+                    }
+                    case "add_allowed" -> {
+                        if (payload.unit() != null) {
+                            manager.addAllowedPlayer(payload.unit(), player.getUuid());
+                            List<SpaceUnit> ownedUnits = manager.config.getOwned(player.getUuid());
+                            UnitPayloadS2C.send("update", player, ownedUnits);
+                        }
                     }
                 }
             }

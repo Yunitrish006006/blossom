@@ -84,6 +84,14 @@ public record SpaceUnit(String name, double x, double y, double z, String dimens
         return BlockPos.ofFloored(x,y,x);
     }
 
+    public boolean canEdit(UUID playerId) {
+        return owner().equals(playerId) || admin().contains(playerId);
+    }
+
+    public boolean canTeleport(UUID playerId) {
+        return owner().equals(playerId) || admin().contains(playerId) || allowed().contains(playerId);
+    }
+
     public void teleport(ServerPlayerEntity player) {
         UUID id = player.getUuid();
         if (!(owner.equals(id) || admin.contains(id) || allowed.contains(id))) {
