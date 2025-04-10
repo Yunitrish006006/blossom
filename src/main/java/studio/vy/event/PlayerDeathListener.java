@@ -1,16 +1,17 @@
 package studio.vy.event;
 
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.minecraft.server.network.ServerPlayerEntity;
 import studio.vy.TeleportSystem.Component.SpaceUnit;
 import studio.vy.TeleportSystem.SpaceUnitManager;
 
 public class PlayerDeathListener {
     public static void register() {
-        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-            if (!alive) {
-                SpaceUnit newUnit = new SpaceUnit(oldPlayer.getName().getString()+"'s grave",oldPlayer);
-                SpaceUnitManager.getServerInstance().addUnit(newUnit);
-            }
+        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, damageAmount) -> {
+            if (!(entity instanceof ServerPlayerEntity player)) return true;
+            SpaceUnit newUnit = new SpaceUnit(player.getName().getString()+"'s grave", player);
+            SpaceUnitManager.getServerInstance().addUnit(newUnit);
+            return true;
         });
     }
 }

@@ -64,9 +64,9 @@ public class TeleportConfirm extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
         String requestPlayerName = "";
-        for (PlayerListEntry request : client.getNetworkHandler().getPlayerList()) {
-            if (request.getProfile().getId().equals(requester)) {
-                requestPlayerName = request.getProfile().getName();
+        for (PlayerListEntry player : client.getNetworkHandler().getPlayerList()) {
+            if (player.getProfile().getId().equals(target)) {
+                requestPlayerName = player.getProfile().getName();
             }
         }
         context.drawCenteredTextWithShadow(textRenderer,
