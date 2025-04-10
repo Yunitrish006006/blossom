@@ -1,15 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
+  "group": "armor_copper",
   "key": {
-    "X": "minecraft:copper_ingot"
+    "#": "minecraft:copper_ingot"
   },
   "pattern": [
-    "XXX",
-    "X X"
+    "###",
+    "# #",
+    "# #"
   ],
   "result": {
     "count": 1,
-    "id": "blossom:copper_helmet"
+    "id": "blossom:copper_leggings"
   }
 }
