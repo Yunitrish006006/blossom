@@ -30,5 +30,13 @@ public class ModModelProvider extends FabricModelProvider {
         itemModelGenerator.registerArmor(ModItems.COPPER_LEGGINGS, ModEquipmentAssetKeys.COPPER,ItemModelGenerator.LEGGINGS_TRIM_ID_PREFIX, false);
         itemModelGenerator.registerArmor(ModItems.COPPER_CHESTPLATE, ModEquipmentAssetKeys.COPPER,ItemModelGenerator.CHESTPLATE_TRIM_ID_PREFIX, false);
         itemModelGenerator.registerArmor(ModItems.COPPER_HELMET, ModEquipmentAssetKeys.COPPER,ItemModelGenerator.HELMET_TRIM_ID_PREFIX, false);
+
+        itemModelGenerator.register(ModItems.WOODEN_HAMMER, Models.GENERATED);
+        itemModelGenerator.register(ModItems.STONE_HAMMER, Models.GENERATED);
+        itemModelGenerator.register(ModItems.IRON_HAMMER, Models.GENERATED);
+        itemModelGenerator.register(ModItems.COPPER_HAMMER, Models.GENERATED);
+        itemModelGenerator.register(ModItems.GOLDEN_HAMMER, Models.GENERATED);
+        itemModelGenerator.register(ModItems.DIAMOND_HAMMER, Models.GENERATED);
+        itemModelGenerator.register(ModItems.NETHERITE_HAMMER, Models.GENERATED);
     }
 }

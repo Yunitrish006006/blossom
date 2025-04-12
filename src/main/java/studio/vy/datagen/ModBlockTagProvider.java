@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import studio.vy.block.ModBlocks;
+import studio.vy.util.ModTags;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -21,5 +22,15 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .add(ModBlocks.GRAVEL_IRON_ORE);
         getOrCreateTagBuilder(BlockTags.NEEDS_STONE_TOOL)
                 .add(ModBlocks.GRAVEL_IRON_ORE);
+
+        getOrCreateTagBuilder(ModTags.Blocks.HAMMER_EFFICIENCY)
+                .addOptionalTag(BlockTags.PLANKS)
+                .addOptionalTag(BlockTags.STONE_BRICKS)
+                .addOptionalTag(BlockTags.WALLS);
+
+        getOrCreateTagBuilder(ModTags.Blocks.HAMMER_MINEABLE)
+                .addOptionalTag(BlockTags.AXE_MINEABLE)
+                .addOptionalTag(BlockTags.PICKAXE_MINEABLE)
+                .addOptionalTag(ModTags.Blocks.HAMMER_EFFICIENCY);
     }
 }

@@ -27,6 +27,13 @@ public class ModItemGroups {
                         entries.add(ModItems.COPPER_CHESTPLATE);
                         entries.add(ModItems.COPPER_LEGGINGS);
                         entries.add(ModItems.COPPER_BOOTS);
+                        entries.add(ModItems.WOODEN_HAMMER);
+                        entries.add(ModItems.STONE_HAMMER);
+                        entries.add(ModItems.IRON_HAMMER);
+                        entries.add(ModItems.COPPER_HAMMER);
+                        entries.add(ModItems.GOLDEN_HAMMER);
+                        entries.add(ModItems.DIAMOND_HAMMER);
+                        entries.add(ModItems.NETHERITE_HAMMER);
                     }))
                     .build());
 

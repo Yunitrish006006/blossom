@@ -7,6 +7,14 @@
   "item.blossom.copper_leggings": "Copper Leggings",
   "item.blossom.copper_boots": "Copper Boots",
 
+  "item.blossom.wooden_hammer": "Wooden Hammer",
+  "item.blossom.stone_hammer": "Stone Hammer",
+  "item.blossom.iron_hammer": "Iron Hammer",
+  "item.blossom.copper_hammer": "Copper Hammer",
+  "item.blossom.golden_hammer": "Golden Hammer",
+  "item.blossom.diamond_hammer": "Diamond Hammer",
+  "item.blossom.netherite_hammer": "Netherite Hammer",
+
   "block.blossom.fishnet": "Fishnet",
   "block.blossom.trash_can": "Trash Can",
   "block.blossom.gravel_iron_ore": "Gravel Iron Ore",
@@ -38,5 +46,9 @@
   "gui.blossom.teleport.request.message": "%s Requested to TP to your location",
   "gui.blossom.teleport.rejected": "%s Rejected your TP Request",
   "gui.blossom.teleport.players": "Player teleport",
-  "gui.blossom.teleport.search_player": "Search player"
+
+  "tag.item.blossom.hammer_efficiency": "Hammer Efficiency",
+  "tag.item.blossom.hammer_mineable": "Hammer Mineable",
+  "tag.item.blossom.crushable_items": "Crushable Items",
+  "tag.item.blossom.copper_repair": "Copper Repair"
 }
