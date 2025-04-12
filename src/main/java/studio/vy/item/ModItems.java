@@ -17,6 +17,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import studio.vy.Blossom;
 import studio.vy.block.ModBlocks;
+import studio.vy.item.custom.HammerItem;
 import studio.vy.util.ModTags;
 
 import java.util.function.Function;
