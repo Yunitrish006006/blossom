@@ -44,5 +44,11 @@
   "tag.item.blossom.hammer_efficiency": "錘子高效方塊",
   "tag.item.blossom.hammer_mineable": "錘子可挖方塊",
   "tag.item.blossom.crushable_items": "可破碎物品",
-  "tag.item.blossom.copper_repair": "銅質修復材料"
+  "tag.item.blossom.copper_repair": "銅質修復材料",
+
+  "message.blossom.hammer.range_exceeded": "超出最大挖掘範圍！最大範圍：%dx%dx%d",
+  "message.blossom.hammer.select.start": "已選擇區域起點：",
+  "message.blossom.hammer.select.end": "已選擇區域終點：",
+  "message.blossom.hammer.select.range": "已選擇區域：",
+  "message.blossom.hammer.select.to": " 到 "
 }

@@ -2,7 +2,6 @@ package studio.vy.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.block.Blocks;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.BlockTags;
 import studio.vy.block.ModBlocks;
@@ -33,15 +32,7 @@ public class ModBlockTagProvider extends FabricTagProvider.BlockTagProvider {
                 .addOptionalTag(BlockTags.AXE_MINEABLE)
                 .addOptionalTag(BlockTags.PICKAXE_MINEABLE)
                 .addOptionalTag(BlockTags.DIRT)
+                .addOptionalTag(BlockTags.SAND)
                 .addOptionalTag(ModTags.Blocks.HAMMER_EFFICIENCY);
-
-        getOrCreateTagBuilder(ModTags.Blocks.HAMMER_DRAGGABLE)
-                .add(Blocks.CHEST)
-                .add(Blocks.BARREL)
-                .add(Blocks.TRAPPED_CHEST)
-                .add(Blocks.ENDER_CHEST)
-                .add(Blocks.FURNACE)
-                .add(Blocks.BLAST_FURNACE)
-                .add(Blocks.SMOKER);
     }
 }

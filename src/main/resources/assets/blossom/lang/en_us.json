@@ -50,5 +50,11 @@
   "tag.item.blossom.hammer_efficiency": "Hammer Efficiency",
   "tag.item.blossom.hammer_mineable": "Hammer Mineable",
   "tag.item.blossom.crushable_items": "Crushable Items",
-  "tag.item.blossom.copper_repair": "Copper Repair"
+  "tag.item.blossom.copper_repair": "Copper Repair",
+
+  "message.blossom.hammer.range_exceeded": "Exceeds maximum mining range! Max range: %dx%dx%d",
+  "message.blossom.hammer.select.start": "Selected starting point: ",
+  "message.blossom.hammer.select.end": "Selected ending point: ",
+  "message.blossom.hammer.select.range": "Selected area: ",
+  "message.blossom.hammer.select.to": " to "
 }

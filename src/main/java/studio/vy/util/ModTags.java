@@ -15,8 +15,6 @@ public class ModTags {
         public static final TagKey<Block> HAMMER_EFFICIENCY = createTag("hammer_efficiency");
 
         public static final TagKey<Block> HAMMER_MINEABLE = createTag("hammer_mineable");
-
-        public static final TagKey<Block> HAMMER_DRAGGABLE = createTag("hammer_draggable");
     }
     public static class Items {
 

@@ -1,7 +1,7 @@
 // 1.21.5	-999999999-01-01T00:00:00	Blossom/Tags for minecraft:block
 85217258b0b0da170de6dd371a7a486617aea814 data/blossom/tags/block/hammer_draggable.json
 45f77b1a2b0d0877c79c93d959bdb506192d6059 data/blossom/tags/block/hammer_efficiency.json
-853d641b6e713bde97b87ff4eaee369eca4a1610 data/blossom/tags/block/hammer_mineable.json
+979dc6f3a94137ace8b637ae1574933d3454ee7d data/blossom/tags/block/hammer_mineable.json
 0a57d8437648dcacbb658ca4ba9016f6b14bcbaa data/minecraft/tags/block/iron_ores.json
 0a57d8437648dcacbb658ca4ba9016f6b14bcbaa data/minecraft/tags/block/mineable/shovel.json
 0a57d8437648dcacbb658ca4ba9016f6b14bcbaa data/minecraft/tags/block/needs_stone_tool.json
